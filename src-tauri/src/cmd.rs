@@ -18,18 +18,36 @@ pub fn create_collection(name: String) -> Collection {
         .values(&new_collection)
         .returning(Collection::as_returning())
         .get_result(connection)
-        .expect("Error saving new collections")
+        .expect("Error saving new post")
 }
 
 #[tauri::command]
-pub async fn get_collections() -> Vec<Collection> {
-    use crate::schema::collections::dsl::collections;
+pub async fn get_collections() -> Vec<CollectionWithRequests> {
     let mut connection = db::establish_connection();
-    let results = collections
+
+    let all_collections: Vec<Collection> = schema::collections::table
         .select(Collection::as_select())
         .load(&mut connection)
-        .expect("Error loading posts");
-    results
+        .expect("Error in fetching all collections");
+
+    // Load all requests
+    let all_requests: Vec<Requests> = schema::requests::table
+        .select(Requests::as_select())
+        .load(&mut connection)
+        .expect("Error in fetching all requests");
+
+    // Group the requests per collection
+    let requests_per_collection = all_requests
+        .grouped_by(&all_collections)
+        .into_iter()
+        .zip(all_collections)
+        .map(|(requests, collection)| CollectionWithRequests {
+            collection,
+            requests,
+        })
+        .collect::<Vec<CollectionWithRequests>>();
+
+    requests_per_collection
 }
 
 #[tauri::command]
@@ -44,8 +62,7 @@ pub fn create_request(name: String, uuid: String) -> Requests {
         .first(connection) // Load the first matching record
         .expect("Error loading collection"); //
 
-
-    let new_request = NewRequest {
+    let new_request: NewRequest = NewRequest {
         name: name,
         request_data: "{}".to_string(),
         uuid: String::from(&request_uuid),
@@ -55,5 +72,8 @@ pub fn create_request(name: String, uuid: String) -> Requests {
         .values(&new_request)
         .returning(Requests::as_returning())
         .get_result(connection)
-        .expect("Error saving new request")
+        .expect("Error saving new post")
 }
+
+
+

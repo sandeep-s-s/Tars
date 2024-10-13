@@ -5,13 +5,12 @@
 
 	// For Modal
 	let showModal = false;
-	let files = ["File 1-1", "File 1-2", "File 1-3"];
 
 	let collections = [{}];
 	// Function to toggle the visibility of files
 	// folder.isOpen = true
-	function toggleFiles(folder) {
-		folder.isOpen = !folder.isOpen;
+	function toggleFiles(collection) {
+		collection.is_open = !collection.is_open;
 		collections = [...collections];
 	}
 
@@ -22,8 +21,12 @@
 		collections = [...collections, response];
 	}
 
-	onMount(async () => {
+	async function getAllCollections(){
 		collections = await invoke("get_collections");
+	}
+	onMount(async () => {
+		getAllCollections();
+		console.log(collections)
 	});
 
 	let requestFormModel = false
@@ -31,6 +34,7 @@
 	let uuid = "c8056c96-b204-4114-80c1-567ed9d827f4"
 	async function createRequest() {
 		response = await invoke("create_request",{name,uuid})	
+		getAllCollections()
 	}
 </script>
 
@@ -47,16 +51,16 @@
 			<div class="collection">
 				<a on:click={() => toggleFiles(collection)}>
 					<i
-						class="folder-icon {collection.isOpen
+						class="folder-icon {collection.is_open
 							? 'fas fa-folder-open'
 							: 'fas fa-folder'}"
 					></i>
 					{collection.name}
 				</a>
-				{#if collection.isOpen}
+				{#if collection.is_open}
 					<div class="files">
-						{#each files as file}
-							<div class="file">{file}</div>
+						{#each collection.requests as request}
+							<div class="file">{request.name}</div>
 						{/each}
 					</div>
 				{/if}

@@ -9,7 +9,8 @@ pub struct NewCollection {
     pub uuid: String,
 }
 
-#[derive(Queryable, Selectable, Serialize, Deserialize)]
+// #[derive(Queryable, Selectable, Serialize, Deserialize)]
+#[derive(Queryable, Identifiable, Selectable, Debug, PartialEq,Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::collections)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Collection {
@@ -40,9 +41,12 @@ pub struct NewRequest {
 }
 
 
-#[derive(Queryable, Selectable, Serialize, Deserialize)]
+// #[derive(Queryable, Selectable, Serialize, Deserialize,Associations)]
 #[diesel(table_name = crate::schema::requests)]
-#[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+// #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+#[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq, Serialize)]
+#[diesel(belongs_to(Collection))]
+// #[diesel(table_name = requests)]
 pub struct Requests {
     #[diesel(sql_type = Integer)]
     pub id: i32,
@@ -58,4 +62,14 @@ pub struct Requests {
     pub create_date: String,
     #[diesel(sql_type = Text)]
     pub update_date: String,
+    #[diesel(sql_type = Integer)]
+    pub collection_id: i32,
+}
+
+
+#[derive(Serialize)]
+pub struct CollectionWithRequests {
+    #[serde(flatten)]
+    pub collection: Collection,
+    pub requests: Vec<Requests>,
 }
