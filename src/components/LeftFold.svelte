@@ -1,65 +1,56 @@
 <script>
-    import { onMount } from "svelte";
+	import { invoke } from "@tauri-apps/api/core";
+	import { onMount } from "svelte";
 	import Modal from "../Util/Modal.svelte";
+
 	// For Modal
 	let showModal = false;
-	let files = ['File 1-1', 'File 1-2', 'File 1-3']
+	let files = ["File 1-1", "File 1-2", "File 1-3"];
 
 	let collections = [{}];
-	// Sample JSON data
-	// let collectionData = [
-	// 	{
-	// 		name: 'Collection 1',
-	// 		files: ['File 1-1', 'File 1-2', 'File 1-3'],
-	// 		isOpen: true // Initialize isOpen
-	// 	},
-	// 	{
-	// 		name: 'Collection 2',
-	// 		files: ['File 2-1', 'File 2-2'],
-	// 		isOpen: false // Initialize isOpen
-	// 	},
-	// 	{
-	// 		name: 'Collection 3',
-	// 		files: ['File 3-1', 'File 3-2', 'File 3-3', 'File 3-4'],
-	// 		isOpen: false // Initialize isOpen
-	// 	}
-	// ];
-
 	// Function to toggle the visibility of files
 	// folder.isOpen = true
 	function toggleFiles(folder) {
-		console.log(folder);
 		folder.isOpen = !folder.isOpen;
 		collections = [...collections];
 	}
 
-  import { invoke } from "@tauri-apps/api/core";
-    import Header from "./Header.svelte";
-
-  let response = {};
-let name = "";
-  async function createCollection() {
-    response = await invoke("create_collection", { name });
-	collections = [...collections,response]
-  }
-
-  
+	let response = {};
+	let name = "";
+	async function createCollection() {
+		response = await invoke("create_collection", { name });
+		collections = [...collections, response];
+	}
 
 	onMount(async () => {
 		collections = await invoke("get_collections");
-		// alert(collections);
 	});
+
+	let requestFormModel = false
+	let request_name = ""
+	let uuid = "c8056c96-b204-4114-80c1-567ed9d827f4"
+	async function createRequest() {
+		response = await invoke("create_request",{name,uuid})	
+	}
 </script>
 
 <div class="leftFoldContainer">
 	<div class="collectionButton">
-		<button class="btn btn-outline-danger" on:click={() => (showModal = true)}>New Collection</button>
+		<button
+			class="btn btn-outline-danger"
+			on:click={() => (showModal = true)}>New Collection</button
+		>
+		<button on:click={() => requestFormModel = true}>Open User Info Modal</button>
 	</div>
 	<div class="collectionList">
 		{#each collections as collection}
 			<div class="collection">
-				<a  on:click={() => toggleFiles(collection)}>
-					<i class="folder-icon {collection.isOpen ? 'fas fa-folder-open' : 'fas fa-folder'}"></i>
+				<a on:click={() => toggleFiles(collection)}>
+					<i
+						class="folder-icon {collection.isOpen
+							? 'fas fa-folder-open'
+							: 'fas fa-folder'}"
+					></i>
 					{collection.name}
 				</a>
 				{#if collection.isOpen}
@@ -75,17 +66,34 @@ let name = "";
 </div>
 
 <Modal bind:showModal>
-	<h2 slot="header">
-		Collection
-	</h2>
+	<h2 slot="header">Collection</h2>
 	<form on:submit={() => createCollection}>
-		<input type="text" placeholder="collection Name" bind:value={name}>
-		<button class="btn btn-outline-danger" type="submit" on:click={() => createCollection()}>Create</button>
+		<input type="text" placeholder="collection Name" bind:value={name} />
+		<button
+			class="btn btn-outline-danger"
+			type="submit"
+			on:click={() => createCollection()}>Create</button
+		>
 	</form>
 </Modal>
 
+<Modal bind:showModal={requestFormModel}>
+	<h2 slot="header">New Request</h2>
+	<form on:submit={() => createRequest}>
+		<input type="text" placeholder="request Name" bind:value={name} />
+		<!-- <input type="text" placeholder="request Name" bind:value={request_name} /> -->
+		
+		<button
+			class="btn btn-outline-danger"
+			type="submit"
+			on:click={() => createRequest()}>Create</button
+		>
+	</form>
+</Modal>
+
+
 <style>
-	.leftFoldContainer{
+	.leftFoldContainer {
 		margin: 15px;
 	}
 	.collection {
@@ -101,8 +109,8 @@ let name = "";
 		font-size: 18px;
 		font-weight: 800;
 	}
-    .collectionButton{
-        margin-top: 15px;
-        margin-bottom: 15px;
-    }
+	.collectionButton {
+		margin-top: 15px;
+		margin-bottom: 15px;
+	}
 </style>

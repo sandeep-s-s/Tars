@@ -1,8 +1,5 @@
-use crate::db;
-use crate::models;
-use crate::schema;
+use crate::{db, models, schema};
 use diesel::prelude::*;
-use std::collections;
 use uuid::Uuid;
 
 use crate::models::*;
@@ -21,24 +18,42 @@ pub fn create_collection(name: String) -> Collection {
         .values(&new_collection)
         .returning(Collection::as_returning())
         .get_result(connection)
-        .expect("Error saving new post")
+        .expect("Error saving new collections")
 }
 
-
-// remember to call `.manage(MyState::default())`
 #[tauri::command]
 pub async fn get_collections() -> Vec<Collection> {
-use crate::schema::collections::dsl::collections;
- let mut connection = db::establish_connection();
-//   let results = collections
-//     .order(schema::collections::sort.asc())
-//     .load::<models::Collection>(&mut connection)
-//     .expect("Expect loading folders");
-let results = collections
-        // .filter(published.eq(1))
-        // .limit(5)
+    use crate::schema::collections::dsl::collections;
+    let mut connection = db::establish_connection();
+    let results = collections
         .select(Collection::as_select())
         .load(&mut connection)
         .expect("Error loading posts");
-  results
+    results
+}
+
+#[tauri::command]
+pub fn create_request(name: String, uuid: String) -> Requests {
+    use crate::schema::*;
+    let connection = &mut db::establish_connection();
+    let request_uuid = Uuid::new_v4().hyphenated().to_string();
+
+    let collection: models::Collection = schema::collections::table
+        .filter(schema::collections::uuid.eq(uuid)) // Add filter for uuid
+        .select(Collection::as_select())
+        .first(connection) // Load the first matching record
+        .expect("Error loading collection"); //
+
+
+    let new_request = NewRequest {
+        name: name,
+        request_data: "{}".to_string(),
+        uuid: String::from(&request_uuid),
+        collection_id: collection.id,
+    };
+    diesel::insert_into(requests::table)
+        .values(&new_request)
+        .returning(Requests::as_returning())
+        .get_result(connection)
+        .expect("Error saving new request")
 }
