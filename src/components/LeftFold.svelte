@@ -31,10 +31,19 @@
 
 	let requestFormModel = false
 	let request_name = ""
-	let uuid = "c8056c96-b204-4114-80c1-567ed9d827f4"
+	let uuid = ""
 	async function createRequest() {
 		response = await invoke("create_request",{name,uuid})	
 		getAllCollections()
+	}
+
+	function loadRequest(requestUuid) {
+		alert(requestUuid)
+	}
+
+	function loadRequestModal(collectionUuid){
+		requestFormModel = true;
+		uuid = collectionUuid
 	}
 </script>
 
@@ -44,23 +53,25 @@
 			class="btn btn-outline-danger"
 			on:click={() => (showModal = true)}>New Collection</button
 		>
-		<button on:click={() => requestFormModel = true}>Open User Info Modal</button>
 	</div>
 	<div class="collectionList">
 		{#each collections as collection}
 			<div class="collection">
-				<a on:click={() => toggleFiles(collection)}>
+				<span on:click={() => toggleFiles(collection)}>
 					<i
 						class="folder-icon {collection.is_open
 							? 'fas fa-folder-open'
 							: 'fas fa-folder'}"
 					></i>
-					{collection.name}
-				</a>
+					{collection.name} 
+				</span>
+				<span class="add-request-icon" on:click={() => loadRequestModal(collection.uuid) }><i class="fa fa-plus-square" aria-hidden="true"></i></span>
 				{#if collection.is_open}
-					<div class="files">
+					<div class="requests">
 						{#each collection.requests as request}
-							<div class="file">{request.name}</div>
+							<div class="request">
+								<span on:click={() => loadRequest(request.uuid)}>{request.name}</span>
+							</div>
 						{/each}
 					</div>
 				{/if}
@@ -71,12 +82,12 @@
 
 <Modal bind:showModal>
 	<h2 slot="header">Collection</h2>
-	<form on:submit={() => createCollection}>
-		<input type="text" placeholder="collection Name" bind:value={name} />
+	<form on:submit={() => createCollection()}>
+		<input type="text" class="form-control" placeholder="collection Name" bind:value={name} />
 		<button
 			class="btn btn-outline-danger"
 			type="submit"
-			on:click={() => createCollection()}>Create</button
+			>Create</button
 		>
 	</form>
 </Modal>
@@ -84,9 +95,7 @@
 <Modal bind:showModal={requestFormModel}>
 	<h2 slot="header">New Request</h2>
 	<form on:submit={() => createRequest}>
-		<input type="text" placeholder="request Name" bind:value={name} />
-		<!-- <input type="text" placeholder="request Name" bind:value={request_name} /> -->
-		
+		<input type="text"  class="form-control" placeholder="request Name" bind:value={name} />
 		<button
 			class="btn btn-outline-danger"
 			type="submit"
@@ -104,17 +113,20 @@
 		cursor: pointer;
 		margin: 5px 0;
 	}
-	.file {
-		padding-left: 20px; /* Indent files */
-		font-size: medium;
-		font-weight: 700;
-	}
-	.collection a {
-		font-size: 18px;
-		font-weight: 800;
+	.requests {
+		/* padding-left: 20px; Indent files */
+
+		padding: .1875rem .5rem;
+		margin-top: .125rem;
+		margin-left: 1.25rem;
+		/* color: rgba(0,0,0,0.65); */
+		text-decoration: none;
 	}
 	.collectionButton {
 		margin-top: 15px;
 		margin-bottom: 15px;
+	}
+	.add-request-icon{
+		margin-right: 50px;
 	}
 </style>
