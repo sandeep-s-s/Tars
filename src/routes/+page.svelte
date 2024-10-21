@@ -47,10 +47,10 @@
     border-right: 1px solid whitesmoke;
   }
   .rightFold {
-    display: flex;
+    /* display: flex; */
     flex: 11;
     /* align-items: center; */
-    justify-content: flex-start;
+    /* justify-content: flex-start; */
     border-right: 1px solid whitesmoke;
   }
 </style>

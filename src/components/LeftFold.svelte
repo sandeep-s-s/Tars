@@ -54,17 +54,19 @@
 			on:click={() => (showModal = true)}>New Collection</button
 		>
 	</div>
-	<div class="collectionList">
+	<div class="collection-items">
 		{#each collections as collection}
 			<div class="collection">
-				<span on:click={() => toggleFiles(collection)}>
+				<div class="collection-logo">
 					<i
 						class="folder-icon {collection.is_open
 							? 'fas fa-folder-open'
 							: 'fas fa-folder'}"
 					></i>
+				</div>
+				<div class="collection-name" on:click={() => toggleFiles(collection)}>
 					{collection.name} 
-				</span>
+				</div>
 				<span class="add-request-icon" on:click={() => loadRequestModal(collection.uuid) }><i class="fa fa-plus-square" aria-hidden="true"></i></span>
 				{#if collection.is_open}
 					<div class="requests">
@@ -108,6 +110,11 @@
 <style>
 	.leftFoldContainer {
 		margin: 15px;
+	}
+
+	.collection {
+		display: flex;
+		/* justify-content: space-between; */
 	}
 	.collection {
 		cursor: pointer;
