@@ -1,5 +1,6 @@
 use crate::{db, models, schema};
 use diesel::prelude::*;
+
 use uuid::Uuid;
 
 use crate::models::*;
@@ -62,9 +63,30 @@ pub fn create_request(name: String, uuid: String) -> Requests {
         .first(connection) // Load the first matching record
         .expect("Error loading collection"); //
 
+    let requestJson = r#"{
+        "v": "1",
+        "endpoint": "",
+        "name": "Untitled Request",
+        "params": [],
+        "headers": [],
+        "method": "GET",
+        "auth": {
+            "authType": "",
+            "authActive": false,
+            "username": "",
+            "password": "",
+            "token": ""
+        },
+        "preRequestScript": "",
+        "testScript": "",
+        "body": {
+            "contentType": null,
+            "body": null
+        }
+    }"#;
     let new_request: NewRequest = NewRequest {
         name: name,
-        request_data: "{}".to_string(),
+        request_data: requestJson.to_string(),
         uuid: String::from(&request_uuid),
         collection_id: collection.id,
     };
@@ -73,7 +95,28 @@ pub fn create_request(name: String, uuid: String) -> Requests {
         .returning(Requests::as_returning())
         .get_result(connection)
         .expect("Error saving new post")
+    
 }
 
+#[tauri::command]
+pub async fn get_request(uuid: String) -> String {
+    let mut connection = db::establish_connection();
+    let request: models::Requests = schema::requests::table
+        .filter(schema::requests::uuid.eq(uuid)) // Add filter for uuid
+        .select(Requests::as_select())
+        .first(&mut connection) // Load the first matching record
+        .expect("Error loading collection"); //
+    return request.request_data;
+}
 
+#[tauri::command]
+pub fn save_request(uuid: String, request: String) -> Requests {
+    let connection = &mut db::establish_connection();
 
+    diesel::update(schema::requests::table)
+        .filter(schema::requests::dsl::uuid.eq(uuid))
+        .set(schema::requests::dsl::request_data.eq(request))
+        .returning(Requests::as_returning())
+        .get_result(connection)
+        .expect("Error in updating request")
+}

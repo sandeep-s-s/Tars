@@ -1,7 +1,7 @@
 <script>
 	export let request = {};
 	// export let params = request["params"]
-	if (request["params"].length === 0) {
+	if (request && request["params"] && request["params"].length === 0) {
 		request["params"].push({
 			key: "",
 			value: "",
@@ -35,57 +35,59 @@
 </script>
 
 <div class="request-parameter-container">
-	{#each request["params"] as v, i}
-		<div class="request-parameter">
-			<div class="col-4">
-				<input
-					id={i}
-					type="text"
-					bind:value={v.key}
-					placeholder="key"
-					class="form-control form-control-sm"
-				/>
+	{#if request && request["params"]}
+		{#each request["params"] as v, i}
+			<div class="request-parameter">
+				<div class="col-4">
+					<input
+						id={i}
+						type="text"
+						bind:value={v.key}
+						placeholder="key"
+						class="form-control form-control-sm"
+					/>
+				</div>
+				<div class="col-4">
+					<input
+						id={i}
+						type="text"
+						bind:value={v.value}
+						placeholder="value"
+						class="form-control form-control-sm"
+					/>
+				</div>
+				<div class="col-1">
+					<input
+						type="checkbox"
+						bind:checked={v.checked}
+						on:change={(e) => addChecked(i)}
+						title="Select"
+					/>
+				</div>
+				<div class="col-2">
+					<button
+						on:click={(e) => deleteElement(i)}
+						class="btn btn-outline-danger"
+						title="Delete">Delete</button
+					>
+				</div>
 			</div>
-			<div class="col-4">
-				<input
-					id={i}
-					type="text"
-					bind:value={v.value}
-					placeholder="value"
-					class="form-control form-control-sm"
-				/>
-			</div>
-			<div class="col-1">
-				<input
-					type="checkbox"
-					bind:checked={v.checked}
-					on:change={(e) => addChecked(i)}
-					title="Select"
-				/>
-			</div>
-			<div class="col-2">
-				<button
-					on:click={(e) => deleteElement(i)}
-					class="btn btn-outline-danger"
-					title="Delete">Delete</button
-				>
-			</div>
-		</div>
-	{/each}
+		{/each}
+	{/if}
 </div>
-		<button
-			on:click|preventDefault={addField}
-			class="btn btn-outline-danger"
-			title="Add New">Add</button
-		>
+<button
+	on:click|preventDefault={addField}
+	class="btn btn-outline-danger"
+	title="Add New">Add</button
+>
 
 <style>
-	.request-parameter-container{
+	.request-parameter-container {
 		margin: 5px;
 		gap: 15px;
 	}
-	
-	.request-parameter{
+
+	.request-parameter {
 		margin: 5px;
 		display: flex;
 		gap: 15px;

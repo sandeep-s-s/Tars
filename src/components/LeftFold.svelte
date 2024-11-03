@@ -3,6 +3,11 @@
 	import { onMount } from "svelte";
 	import Modal from "../Util/Modal.svelte";
 
+	import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher();
+
+	export let requestUUid = ""
 	// For Modal
 	let showModal = false;
 
@@ -26,7 +31,6 @@
 	}
 	onMount(async () => {
 		getAllCollections();
-		console.log(collections)
 	});
 
 	let requestFormModel = false
@@ -38,7 +42,9 @@
 	}
 
 	function loadRequest(requestUuid) {
-		alert(requestUuid)
+		requestUUid = requestUuid
+		dispatch('requestUuid', requestUUid);
+		// console.log(requestUUid)
 	}
 
 	function loadRequestModal(collectionUuid){
@@ -121,8 +127,7 @@
 		margin: 5px 0;
 	}
 	.requests {
-		/* padding-left: 20px; Indent files */
-
+		padding-left: 20px; 
 		padding: .1875rem .5rem;
 		margin-top: .125rem;
 		margin-left: 1.25rem;

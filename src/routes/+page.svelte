@@ -4,7 +4,10 @@
   import Header from "../components/Header.svelte";
   import RightFold from "../components/RightFold.svelte";
 
-
+  let requestUUid = "";
+  function handleRequestChange(event) {
+    requestUUid = event.detail; // Update the variable based on the event
+  }
 </script>
 
 <Header />
@@ -13,10 +16,11 @@
     <Sidebar />
   </div>
   <div class="leftFold">
-    <LeftFold />
+    <!-- <LeftFold bind:requestUUid={requestUUid}/> -->
+    <LeftFold on:requestUuid={handleRequestChange} />
   </div>
   <div class="rightFold">
-    <RightFold />
+    <RightFold {requestUUid} />
   </div>
 </div>
 
