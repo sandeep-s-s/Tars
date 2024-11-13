@@ -105,7 +105,7 @@ pub async fn get_request(uuid: String) -> String {
         .filter(schema::requests::uuid.eq(uuid)) // Add filter for uuid
         .select(Requests::as_select())
         .first(&mut connection) // Load the first matching record
-        .expect("Error loading collection"); //
+        .expect("Error loading request"); //
     return request.request_data;
 }
 
