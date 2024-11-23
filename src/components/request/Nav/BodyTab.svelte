@@ -1,12 +1,11 @@
 <script>
-    import XWwwFormUrlencoded from "../Body/XWwwFormUrlencoded.svelte";
+	import XWwwFormUrlencoded from "../Body/XWwwFormUrlencoded.svelte";
 	import FormDAta from "../Body/FormDAta.svelte";
 	import JsonEditor from "../Body/JsonEditor.svelte";
 	import TextEditor from "../Body/TextEditor.svelte";
 	import XmlEditor from "../Body/XmlEditor.svelte";
 
 	export let request = {};
-	
 
 	let modes = [
 		{ id: 1, text: "None", default: true },
@@ -22,11 +21,11 @@
 		{ id: 4, text: "HTML", default: false },
 	];
 
-	let selectedMode = request["body"].mode; // Default selected mode
-	let rawType = ""; // Default selected raw type
+	// let request["body"].mode = request["body"].mode; // Default selected mode
+	// let request["body"].rawType = ""; // Default selected raw type
 
-	$: if (selectedMode === "raw" && !rawType) {
-		rawType = "Json";
+	$: if (request["body"].mode === "raw" && !request["body"].rawType) {
+		request["body"].rawType = "Json";
 	}
 </script>
 
@@ -39,14 +38,17 @@
 					id={mode.text}
 					name="request-body-type"
 					value={mode.text}
-					bind:group={selectedMode}
+					bind:group={request["body"].mode}
 				/>
 				<label for={mode.text}>{mode.text}</label><br />
 			</div>
 		{/each}
-		{#if selectedMode === "raw"}
+		{#if request["body"].mode === "raw"}
 			<div class="raw-type">
-				<select bind:value={rawType} class="form-control">
+				<select
+					bind:value={request["body"].rawType}
+					class="form-control"
+				>
 					{#each rawTypes as rawTypeOption}
 						<option value={rawTypeOption.text}>
 							{rawTypeOption.text}
@@ -57,35 +59,34 @@
 		{/if}
 	</div>
 
-	{#if selectedMode === "form-data"}
+	{#if request["body"].mode === "form-data"}
 		<div class="formdata-container">
 			<FormDAta {request} />
 		</div>
 	{/if}
-	{#if selectedMode === "x-www-form-urlencoded"}
+	{#if request["body"].mode === "x-www-form-urlencoded"}
 		<div class="formdata-container">
 			<XWwwFormUrlencoded {request} />
 		</div>
 	{/if}
-	{#if selectedMode === "raw" && rawType === "Json"}
+	{#if request["body"].mode === "raw" && request["body"].rawType === "Json"}
 		<div class="json-editor">
-			<JsonEditor />
+			<JsonEditor {request} />
 		</div>
 	{/if}
-	{#if selectedMode === "raw" && rawType === "XML"}
+	{#if request["body"].mode === "raw" && request["body"].rawType === "XML"}
 		<div class="json-editor">
-			<XmlEditor />
+			<XmlEditor {request} />
 		</div>
 	{/if}
-	{#if selectedMode === "raw" && rawType === "Text"}
+	{#if request["body"].mode === "raw" && request["body"].rawType === "Text"}
 		<div class="json-editor">
-			<TextEditor />
+			<TextEditor {request} />
 		</div>
 	{/if}
 </div>
 
 <style>
-	
 	.right-fold-container {
 		margin: 15px;
 		display: flex;
@@ -96,6 +97,5 @@
 	}
 	.json-editor {
 		margin: 15px;
-		/* display: flex; */
 	}
 </style>

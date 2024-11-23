@@ -12,3 +12,4 @@ vite.config.ts.timestamp-*
 .vscode/
 arya.db
 src/node_modules
+package-lock.json

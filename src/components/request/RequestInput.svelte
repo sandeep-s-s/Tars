@@ -2,6 +2,7 @@
   import { invoke } from "@tauri-apps/api/core";
   export let request = {};
   export let requestUUid = ""
+  export let response = {}
   let methods = [
     { id: 1, text: "GET", default: true },
     { id: 2, text: "POST", default: false },
@@ -15,6 +16,11 @@
   async function saveRequest(uuid) {
     request = JSON.stringify(request);
     let response = await invoke("save_request", { uuid, request });
+  }
+  async function sendRequest(request) {
+    request = JSON.stringify(request);
+    response = await invoke("send_request", {  request });
+    console.log(response)
   }
 </script>
 
@@ -33,7 +39,7 @@
     <input bind:value={endpoint} class={"form-control"} placeholder="URL" />
   </div>
   <div class="request-button">
-    <button type="submit" class="btn btn-outline-danger">Send</button>
+    <button type="submit" class="btn btn-outline-danger" on:click={() => sendRequest(request)}>Send</button>
   </div>
   <div class="request-button">
     <button

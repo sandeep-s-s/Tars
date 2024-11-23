@@ -1,20 +1,20 @@
 <script>
-
-	let textInput = ''; // Initial JSON value
+	export let request = {}
+	// let request["body"].raw = ''; // Initial JSON value
 	let errorMessage = '';
 	let lineCount = 1; // Initialize line count
 
 
 
 	function handleInput(event) {
-		textInput = event.target.value;
+		request["body"].raw = event.target.value;
 		errorMessage = ''; // Clear error message on input change
 		updateLineCount(); // Update line count on input change
 	}
 
 	// Function to update the line count based on the current input
 	function updateLineCount() {
-		lineCount = textInput.split('\n').length;
+		lineCount = request["body"].raw.split('\n').length;
 	}
 </script>
 
@@ -26,7 +26,7 @@
 				<br />
 			{/each}
 		</div>
-		<textarea class="editor" bind:value={textInput} on:input={handleInput} rows="20" />
+		<textarea class="editor" bind:value={request["body"].raw} on:input={handleInput} rows="20" />
 	</div>
 	{#if errorMessage}
 		<div class="error">{errorMessage}</div>

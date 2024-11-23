@@ -1,6 +1,7 @@
 use crate::schema::{collections, requests};
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Insertable)]
 #[diesel(table_name = collections)]
@@ -72,4 +73,14 @@ pub struct CollectionWithRequests {
     #[serde(flatten)]
     pub collection: Collection,
     pub requests: Vec<Requests>,
+}
+
+
+
+#[derive(Serialize, Deserialize)]
+pub struct JsonResponse {
+    pub success: bool,
+    pub message: String,
+    pub status_code: u16,
+    pub headers: HashMap<String, String>,
 }

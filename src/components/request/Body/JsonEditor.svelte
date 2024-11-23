@@ -1,13 +1,15 @@
 <script>
 
-	let jsonInput = '{"key": "value"}'; // Initial JSON value
+	// let jsonInput = '{"key": "value"}'; // Initial JSON value
+	export let request = {}
+	// let request["body"].raw = request["body"].raw
 	let errorMessage = '';
 	let lineCount = 1; // Initialize line count
 
 	function formatJson() {
 		try {
-			const parsed = JSON.parse(jsonInput);
-			jsonInput = JSON.stringify(parsed, null, 2); // Format with 2 spaces
+			const parsed = JSON.parse(request["body"].raw);
+			request["body"].raw = JSON.stringify(parsed, null, 2); // Format with 2 spaces
 			errorMessage = ''; // Clear any previous error messages
 			updateLineCount(); // Update line count after formatting
 		} catch (e) {
@@ -16,14 +18,14 @@
 	}
 
 	function handleInput(event) {
-		jsonInput = event.target.value;
+		request["body"].raw = event.target.value;
 		errorMessage = ''; // Clear error message on input change
 		updateLineCount(); // Update line count on input change
 	}
 
 	// Function to update the line count based on the current input
 	function updateLineCount() {
-		lineCount = jsonInput.split('\n').length;
+		lineCount = request["body"].raw.split('\n').length;
 	}
 </script>
 
@@ -36,7 +38,7 @@
 				<br />
 			{/each}
 		</div>
-		<textarea class="editor" bind:value={jsonInput} on:input={handleInput} rows="20" />
+		<textarea class="editor" bind:value={request["body"].raw} on:input={handleInput} rows="20" />
 	</div>
 	{#if errorMessage}
 		<div class="error">{errorMessage}</div>

@@ -1,9 +1,14 @@
+use std::collections::HashMap;
+
 use crate::{db, models, schema};
 use diesel::prelude::*;
 
 use uuid::Uuid;
 
 use crate::models::*;
+
+use reqwest::blocking::Client;
+use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};
 
 #[tauri::command]
 pub fn create_collection(name: String) -> Collection {
@@ -119,4 +124,65 @@ pub fn save_request(uuid: String, request: String) -> Requests {
         .returning(Requests::as_returning())
         .get_result(connection)
         .expect("Error in updating request")
+}
+
+
+
+
+#[tauri::command]
+pub fn send_request(request: String) -> Result<JsonResponse, String> {
+    // let connection = &mut db::establish_connection();
+ // Create a new HTTP client
+  let client = Client::new();
+
+    // Define headers
+    let mut headers = reqwest::header::HeaderMap::new();
+    headers.insert("Content-Type", reqwest::header::HeaderValue::from_static("application/x-www-form-urlencoded"));
+
+    // Define form data
+    let mut form_data = HashMap::new();
+    form_data.insert("key1", "value1");
+    form_data.insert("key2", "value2");
+
+    // Send the POST request
+    let post_response = client
+        .post("https://echo.hoppscotch.io")
+        .headers(headers) // Use the same headers for POST
+        .form(&form_data) // Send form data
+        .send();
+
+
+    // Handle the response
+    match post_response {
+        Ok(response) => {
+            let status_code = response.status().as_u16();
+            let mut response_headers = HashMap::new();
+
+            // Collect headers into a HashMap
+            for (key, value) in response.headers() {
+                response_headers.insert(key.to_string(), value.to_str().unwrap_or("").to_string());
+            }
+
+            if response.status().is_success() {
+                let body = response.text().unwrap_or_else(|_| "No body".to_string());
+                Ok(JsonResponse {
+                    success: true,
+                    message: format!("Request was successful! Response body: {}", body),
+                    status_code,
+                    headers: response_headers,
+                })
+            } else {
+                Ok(JsonResponse {
+                    success: false,
+                    message: format!("Request failed with status: {}", response.status()),
+                    status_code,
+                    headers: response_headers,
+                })
+            }
+        }
+        Err(e) => {
+            Err(format!("Error sending request: {}", e))
+        }
+    } 
+ 
 }

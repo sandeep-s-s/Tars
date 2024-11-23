@@ -6,7 +6,7 @@
 
 	export let requestUUid = "";
 	let request = {};
-
+	export let response = {} ;
 
 	async function loadRequest(uuid) {
 		let response = await invoke("get_request", { uuid });
@@ -16,11 +16,10 @@
 </script>
 
 <div class="col">
-	<!-- <pre>{JSON.stringify(request, null, 1)}</pre> -->
 	<RequestInput
 		{request} {requestUUid}
 		bind:method={request.method}
-		bind:endpoint={request.endpoint}
+		bind:endpoint={request.endpoint} bind:response={response}
 	/>
 	<RequestNav bind:request />
 </div>
