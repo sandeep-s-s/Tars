@@ -9,7 +9,7 @@
 
 	let modes = [
 		{ id: 1, text: "None", default: true },
-		{ id: 2, text: "form-data", default: false },
+		{ id: 2, text: "formData", default: false },
 		{ id: 3, text: "x-www-form-urlencoded", default: false },
 		{ id: 4, text: "raw", default: false },
 	];
@@ -59,7 +59,7 @@
 		{/if}
 	</div>
 
-	{#if request["body"].mode === "form-data"}
+	{#if request["body"].mode === "formData"}
 		<div class="formdata-container">
 			<FormDAta {request} />
 		</div>
