@@ -146,6 +146,7 @@ pub struct Body {
 pub struct FormDaum {
     pub key: String,
     pub value: String,
+    pub checked: Option<bool>,
     #[serde(rename = "type")]
     pub type_field: String,
 }
@@ -155,6 +156,7 @@ pub struct FormDaum {
 pub struct XWwwFormUrlencoded {
     pub key: String,
     pub value: String,
+    pub checked: Option<bool>,
     #[serde(rename = "type")]
     pub type_field: String,
 }

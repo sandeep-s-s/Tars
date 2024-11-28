@@ -125,8 +125,7 @@ pub fn save_request(uuid: String, request: String) -> Requests {
         .expect("Error in updating request")
 }
 
-#[tauri::command]
-pub fn send_request(request: String) -> Result<JsonResponse, String> {
+pub fn send_request1(request: String) -> Result<JsonResponse, String> {
     let request: RequestObject = serde_json::from_str(&request).expect("Failed to parse");
 
     let client = Client::new();
@@ -242,3 +241,108 @@ pub fn send_request(request: String) -> Result<JsonResponse, String> {
 
     Ok(json_response)
 }
+
+#[tauri::command]
+pub fn send_request(request: String) -> Result<JsonResponse, String> {
+    let request: RequestObject = serde_json::from_str(&request).map_err(|_| "Failed to parse request".to_string())?;
+
+    let client = Client::new();
+    let url = request.endpoint;
+
+    // Build query parameters
+    let query_params: HashMap<_, _> = request.params
+        .iter()
+        .filter_map(|param| {
+            if param.checked.unwrap_or(false) {
+                Some((param.key.clone(), param.value.clone()))
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    // Build header parameters
+    let req_headers = request.headers.iter()
+        .filter_map(|header| {
+            if header.checked.unwrap_or(false) {
+                let key = reqwest::header::HeaderName::from_bytes(header.key.as_bytes()).ok()?;
+                let value = reqwest::header::HeaderValue::from_str(&header.value).ok()?;
+                Some((key, value))
+            } else {
+                None
+            }
+        })
+        .collect::<reqwest::header::HeaderMap>();
+
+    // Build request body
+    let body = match request.body.mode.as_str() {
+        "raw" => request.body.raw.clone(),
+        "formData" => {
+            let form_data: HashMap<_, _> = request.body.form_data.iter()
+                .filter_map(|f| {
+                    if f.checked.unwrap_or(false) {
+                        Some((f.key.clone(), f.value.clone()))
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+            serde_urlencoded::to_string(form_data).map_err(|e| e.to_string())?
+        }
+        "x-www-form-urlencoded" => {
+            let x_www_form_data: HashMap<_, _> = request.body.x_www_form_urlencoded.iter()
+                .filter_map(|f| {
+                    if f.checked.unwrap_or(false) {
+                        Some((f.key.clone(), f.value.clone()))
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+            serde_urlencoded::to_string(x_www_form_data).map_err(|e| e.to_string())?
+        }
+        _ => return Err("Unsupported body mode".to_string()),
+    };
+
+    let mut request_builder = match request.method.to_lowercase().as_str() {
+        "get" => client.get(&url),
+        "post" => client.post(&url).body(body),
+        "put" => client.put(&url).body(body),
+        "delete" => client.delete(&url),
+        _ => return Err("Unsupported HTTP method".to_string()),
+    };
+
+    request_builder = request_builder.headers(req_headers).query(&query_params);
+
+    if request.auth.auth_active {
+        match request.auth.auth_type.as_str() {
+            "bearer" => request_builder = request_builder.bearer_auth(&request.auth.token),
+            "basic" => request_builder = request_builder.basic_auth(request.auth.username, Some(request.auth.password)),
+            "noauth" => {}
+            _ => return Err("Unsupported authentication type".to_string()),
+        }
+    }
+
+    let response = request_builder.send().map_err(|e| e.to_string())?;
+
+    let status_code = response.status().as_u16();
+    let success = response.status().is_success();
+    let headers = response.headers()
+        .iter()
+        .map(|(k, v)| (k.to_string(), v.to_str().unwrap_or("").to_string()))
+        .collect::<HashMap<_, _>>();
+
+    let message = response.text().map_err(|e| e.to_string())?;
+
+
+    let json_response = JsonResponse {
+        success,
+        message,
+        status_code,
+        headers,
+    };
+
+    Ok(json_response)
+}
+
+
