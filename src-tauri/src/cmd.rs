@@ -10,6 +10,8 @@ use crate::models::*;
 use base64::{engine::general_purpose, Engine};
 use reqwest::{blocking::Client, Method};
 
+use std::path::PathBuf;
+
 #[tauri::command]
 pub fn create_collection(name: String) -> Collection {
     use crate::schema::*;
@@ -244,13 +246,15 @@ pub fn send_request1(request: String) -> Result<JsonResponse, String> {
 
 #[tauri::command]
 pub fn send_request(request: String) -> Result<JsonResponse, String> {
-    let request: RequestObject = serde_json::from_str(&request).map_err(|_| "Failed to parse request".to_string())?;
+    let request: RequestObject =
+        serde_json::from_str(&request).map_err(|_| "Failed to parse request".to_string())?;
 
     let client = Client::new();
     let url = request.endpoint;
 
     // Build query parameters
-    let query_params: HashMap<_, _> = request.params
+    let query_params: HashMap<_, _> = request
+        .params
         .iter()
         .filter_map(|param| {
             if param.checked.unwrap_or(false) {
@@ -262,7 +266,9 @@ pub fn send_request(request: String) -> Result<JsonResponse, String> {
         .collect();
 
     // Build header parameters
-    let req_headers = request.headers.iter()
+    let req_headers = request
+        .headers
+        .iter()
         .filter_map(|header| {
             if header.checked.unwrap_or(false) {
                 let key = reqwest::header::HeaderName::from_bytes(header.key.as_bytes()).ok()?;
@@ -278,7 +284,10 @@ pub fn send_request(request: String) -> Result<JsonResponse, String> {
     let body = match request.body.mode.as_str() {
         "raw" => request.body.raw.clone(),
         "formData" => {
-            let form_data: HashMap<_, _> = request.body.form_data.iter()
+            let form_data: HashMap<_, _> = request
+                .body
+                .form_data
+                .iter()
                 .filter_map(|f| {
                     if f.checked.unwrap_or(false) {
                         Some((f.key.clone(), f.value.clone()))
@@ -290,7 +299,10 @@ pub fn send_request(request: String) -> Result<JsonResponse, String> {
             serde_urlencoded::to_string(form_data).map_err(|e| e.to_string())?
         }
         "x-www-form-urlencoded" => {
-            let x_www_form_data: HashMap<_, _> = request.body.x_www_form_urlencoded.iter()
+            let x_www_form_data: HashMap<_, _> = request
+                .body
+                .x_www_form_urlencoded
+                .iter()
                 .filter_map(|f| {
                     if f.checked.unwrap_or(false) {
                         Some((f.key.clone(), f.value.clone()))
@@ -317,7 +329,10 @@ pub fn send_request(request: String) -> Result<JsonResponse, String> {
     if request.auth.auth_active {
         match request.auth.auth_type.as_str() {
             "bearer" => request_builder = request_builder.bearer_auth(&request.auth.token),
-            "basic" => request_builder = request_builder.basic_auth(request.auth.username, Some(request.auth.password)),
+            "basic" => {
+                request_builder =
+                    request_builder.basic_auth(request.auth.username, Some(request.auth.password))
+            }
             "noauth" => {}
             _ => return Err("Unsupported authentication type".to_string()),
         }
@@ -327,13 +342,13 @@ pub fn send_request(request: String) -> Result<JsonResponse, String> {
 
     let status_code = response.status().as_u16();
     let success = response.status().is_success();
-    let headers = response.headers()
+    let headers = response
+        .headers()
         .iter()
         .map(|(k, v)| (k.to_string(), v.to_str().unwrap_or("").to_string()))
         .collect::<HashMap<_, _>>();
 
     let message = response.text().map_err(|e| e.to_string())?;
-
 
     let json_response = JsonResponse {
         success,
@@ -345,4 +360,13 @@ pub fn send_request(request: String) -> Result<JsonResponse, String> {
     Ok(json_response)
 }
 
+#[tauri::command]
+pub fn get_absolute_path(file_path: String) -> String {
+    // Convert the file path to a PathBuf
+    let path = PathBuf::from(file_path);
 
+    // Return the absolute path as a string
+    path.canonicalize()
+        .map(|p| p.to_string_lossy().into_owned())
+        .unwrap_or_else(|_| "Invalid path".to_string())
+}

@@ -1,5 +1,49 @@
 <script>
     export let request = {};
+
+    if (
+        request &&
+        request["body"].xWwwFormUrlencoded &&
+        request["body"].xWwwFormUrlencoded.length === 0
+    ) {
+        request["body"].xWwwFormUrlencoded.push({
+            key: "",
+            value: "",
+            checked: false,
+        });
+    }
+    const addField = () => {
+        const xWwwFormUrlencoded = request["body"].xWwwFormUrlencoded;
+
+        const newObject = {
+            key: "",
+            value: "",
+            type: "text",
+            checked: false,
+        };
+
+        const updatedFormData = [...xWwwFormUrlencoded, newObject];
+
+        request["body"].xWwwFormUrlencoded = updatedFormData;
+    };
+
+    const removeField = () => {
+        request["body"].xWwwFormUrlencoded = request["body"].xWwwFormUrlencoded.slice(
+            0,
+            request["body"].xWwwFormUrlencoded.length - 1,
+        );
+    };
+
+    const addChecked = (i) => {
+        request["body"].xWwwFormUrlencoded[i].checked =
+            request["body"].xWwwFormUrlencoded[i].checked;
+    };
+    const deleteElement = (index) => {
+        if (index > -1) {
+            request["body"].xWwwFormUrlencoded.splice(index, 1); 
+        }
+        request["body"].xWwwFormUrlencoded = request["body"].xWwwFormUrlencoded;
+    };
 </script>
 
 <div class="request-form-data-container">
@@ -43,6 +87,11 @@
         {/each}
     {/if}
 </div>
+<button
+    on:click|preventDefault={addField}
+    class="btn btn-outline-danger"
+    title="Add New">Add</button
+>
 
 
 <style>

@@ -18,6 +18,7 @@
     let response = await invoke("save_request", { uuid, request });
   }
   async function sendRequest(request) {
+    console.log(request)
     request = JSON.stringify(request);
     response = await invoke("send_request", {  request });
     console.log(response)

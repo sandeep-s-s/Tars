@@ -1,6 +1,6 @@
 <script>
 	import XWwwFormUrlencoded from "../Body/XWwwFormUrlencoded.svelte";
-	import FormDAta from "../Body/FormDAta.svelte";
+	import FormData from "../Body/FormData.svelte";
 	import JsonEditor from "../Body/JsonEditor.svelte";
 	import TextEditor from "../Body/TextEditor.svelte";
 	import XmlEditor from "../Body/XmlEditor.svelte";
@@ -61,7 +61,7 @@
 
 	{#if request["body"].mode === "formData"}
 		<div class="formdata-container">
-			<FormDAta {request} />
+			<FormData {request} />
 		</div>
 	{/if}
 	{#if request["body"].mode === "x-www-form-urlencoded"}

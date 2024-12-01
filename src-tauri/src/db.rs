@@ -5,8 +5,6 @@ extern crate dirs;
 use dotenv::dotenv;
 use std::env;
 
-
-
 use std::fs;
 use std::path::Path;
 
@@ -54,7 +52,6 @@ pub fn establish_connection() -> SqliteConnection {
         }
         Err(_) => {
             println!("no ARYA_ENV");
-
 
             if !db_file_exists() {
                 create_db_file();

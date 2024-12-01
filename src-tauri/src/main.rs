@@ -15,6 +15,6 @@ fn main() {
     connection
         .run_pending_migrations(MIGRATIONS)
         .expect("Error migrating");
-    
+
     arya_lib::run()
 }

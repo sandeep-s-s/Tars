@@ -11,7 +11,7 @@ pub struct NewCollection {
 }
 
 // #[derive(Queryable, Selectable, Serialize, Deserialize)]
-#[derive(Queryable, Identifiable, Selectable, Debug, PartialEq,Serialize, Deserialize)]
+#[derive(Queryable, Identifiable, Selectable, Debug, PartialEq, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::collections)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Collection {
@@ -31,7 +31,6 @@ pub struct Collection {
     pub is_open: bool,
 }
 
-
 #[derive(Insertable)]
 #[diesel(table_name = requests)]
 pub struct NewRequest {
@@ -40,7 +39,6 @@ pub struct NewRequest {
     pub request_data: String,
     pub collection_id: i32,
 }
-
 
 // #[derive(Queryable, Selectable, Serialize, Deserialize,Associations)]
 #[diesel(table_name = crate::schema::requests)]
@@ -67,15 +65,12 @@ pub struct Requests {
     pub collection_id: i32,
 }
 
-
 #[derive(Serialize)]
 pub struct CollectionWithRequests {
     #[serde(flatten)]
     pub collection: Collection,
     pub requests: Vec<Requests>,
 }
-
-
 
 #[derive(Serialize, Deserialize)]
 pub struct JsonResponse {
@@ -84,9 +79,6 @@ pub struct JsonResponse {
     pub status_code: u16,
     pub headers: HashMap<String, String>,
 }
-
-
-
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
