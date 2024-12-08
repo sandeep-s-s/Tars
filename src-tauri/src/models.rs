@@ -141,6 +141,7 @@ pub struct FormDaum {
     pub checked: Option<bool>,
     #[serde(rename = "type")]
     pub type_field: String,
+    pub src: String,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]

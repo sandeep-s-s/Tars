@@ -1,14 +1,21 @@
 use std::collections::HashMap;
 
-use crate::{db, models, schema};
+use crate::{db, models, schema, utils::helper};
 use diesel::prelude::*;
 
+use serde_json::Value;
 use uuid::Uuid;
 
 use crate::models::*;
 
 use base64::{engine::general_purpose, Engine};
-use reqwest::{blocking::Client, Method};
+use reqwest::{
+    Method,
+    {
+        multipart::{self, Form, Part},
+        Client, Response,
+    },
+};
 
 use std::path::PathBuf;
 
@@ -126,238 +133,21 @@ pub fn save_request(uuid: String, request: String) -> Requests {
         .get_result(connection)
         .expect("Error in updating request")
 }
-
-pub fn send_request1(request: String) -> Result<JsonResponse, String> {
-    let request: RequestObject = serde_json::from_str(&request).expect("Failed to parse");
-
-    let client = Client::new();
-    let url = request.endpoint;
-
-    // Query parameters
-    let mut query_params = HashMap::new();
-    for param in request.params {
-        if param.checked.unwrap_or(false) {
-            query_params.insert(param.key, param.value);
-        }
-    }
-
-    // Header parameters
-    let mut req_headers = reqwest::header::HeaderMap::new();
-    for header in request.headers {
-        if header.checked.unwrap_or(false) {
-            req_headers.insert(
-                reqwest::header::HeaderName::from_bytes(header.key.as_bytes())
-                    .map_err(|e| String::from("An error occurred"))?,
-                reqwest::header::HeaderValue::from_str(&header.value)
-                    .map_err(|e| String::from("An error occurred"))?,
-            );
-        }
-    }
-
-    // Request Body
-    let body = match request.body.mode.as_str() {
-        "raw" => request.body.raw.clone(),
-        "formData" => {
-            let form_data: HashMap<_, _> = request
-                .body
-                .form_data
-                .iter()
-                .map(|f| (f.key.clone(), f.value.clone()))
-                .collect();
-            serde_urlencoded::to_string(form_data).map_err(|e| String::from(&e.to_string()))?
-        }
-        "x-www-form-urlencoded" => {
-            let x_www_form_data: HashMap<_, _> = request
-                .body
-                .x_www_form_urlencoded
-                .iter()
-                .map(|f| (f.key.clone(), f.value.clone()))
-                .collect();
-            serde_urlencoded::to_string(x_www_form_data)
-                .map_err(|e| String::from(&e.to_string()))?
-        }
-        _ => return Err(String::from("Unsupported body mode")),
-    };
-
-    let request_object = client.request(Method::GET, &url);
-    if request.auth.auth_active {
-        match request.auth.auth_type.as_str() {
-            "bearer" => {
-                let _ = request_object.bearer_auth(&request.auth.token);
-            }
-            "basic" => {
-                let _ =
-                    request_object.basic_auth(request.auth.username, Some(request.auth.password));
-            }
-            "noauth" => {
-                // No action needed
-            }
-            _ => return Err(String::from("Unsupported authentication type")),
-        }
-    }
-
-    // Send the request
-    let response = match request.method.to_lowercase().as_str() {
-        "get" => client
-            .get(&url)
-            .headers(req_headers)
-            .query(&query_params)
-            .send()
-            .map_err(|e| String::from(&e.to_string()))?,
-        "post" => client
-            .post(&url)
-            .headers(req_headers)
-            .body(body)
-            .query(&query_params)
-            .send()
-            .map_err(|e| String::from(&e.to_string()))?,
-        "put" => client
-            .put(&url)
-            .headers(req_headers)
-            .query(&query_params)
-            .body(body)
-            .send()
-            .map_err(|e| String::from(&e.to_string()))?,
-        "delete" => client
-            .delete(&url)
-            .headers(req_headers)
-            .query(&query_params)
-            .send()
-            .map_err(|e| String::from(&e.to_string()))?,
-        _ => return Err(String::from("Unsupported HTTP method")),
-    };
-
-    let status_code = response.status().as_u16();
-    let headers = response
-        .headers()
-        .iter()
-        .map(|(k, v)| (k.to_string(), v.to_str().unwrap_or("").to_string()))
-        .collect::<HashMap<_, _>>();
-
-    let json_response = JsonResponse {
-        success: response.status().is_success(),
-        message: response.text().map_err(|e| String::from(&e.to_string()))?,
-        status_code,
-        headers,
-    };
-
-    Ok(json_response)
-}
-
 #[tauri::command]
-pub fn send_request(request: String) -> Result<JsonResponse, String> {
+pub async fn send_request(request: String) -> Result<JsonResponse, String> {
     let request: RequestObject =
         serde_json::from_str(&request).map_err(|_| "Failed to parse request".to_string())?;
 
-    let client = Client::new();
-    let url = request.endpoint;
-
-    // Build query parameters
-    let query_params: HashMap<_, _> = request
-        .params
-        .iter()
-        .filter_map(|param| {
-            if param.checked.unwrap_or(false) {
-                Some((param.key.clone(), param.value.clone()))
-            } else {
-                None
-            }
-        })
-        .collect();
-
-    // Build header parameters
-    let req_headers = request
-        .headers
-        .iter()
-        .filter_map(|header| {
-            if header.checked.unwrap_or(false) {
-                let key = reqwest::header::HeaderName::from_bytes(header.key.as_bytes()).ok()?;
-                let value = reqwest::header::HeaderValue::from_str(&header.value).ok()?;
-                Some((key, value))
-            } else {
-                None
-            }
-        })
-        .collect::<reqwest::header::HeaderMap>();
-
-    // Build request body
-    let body = match request.body.mode.as_str() {
-        "raw" => request.body.raw.clone(),
-        "formData" => {
-            let form_data: HashMap<_, _> = request
-                .body
-                .form_data
-                .iter()
-                .filter_map(|f| {
-                    if f.checked.unwrap_or(false) {
-                        Some((f.key.clone(), f.value.clone()))
-                    } else {
-                        None
-                    }
-                })
-                .collect();
-            serde_urlencoded::to_string(form_data).map_err(|e| e.to_string())?
-        }
-        "x-www-form-urlencoded" => {
-            let x_www_form_data: HashMap<_, _> = request
-                .body
-                .x_www_form_urlencoded
-                .iter()
-                .filter_map(|f| {
-                    if f.checked.unwrap_or(false) {
-                        Some((f.key.clone(), f.value.clone()))
-                    } else {
-                        None
-                    }
-                })
-                .collect();
-            serde_urlencoded::to_string(x_www_form_data).map_err(|e| e.to_string())?
-        }
-        _ => return Err("Unsupported body mode".to_string()),
-    };
-
-    let mut request_builder = match request.method.to_lowercase().as_str() {
-        "get" => client.get(&url),
-        "post" => client.post(&url).body(body),
-        "put" => client.put(&url).body(body),
-        "delete" => client.delete(&url),
-        _ => return Err("Unsupported HTTP method".to_string()),
-    };
-
-    request_builder = request_builder.headers(req_headers).query(&query_params);
-
-    if request.auth.auth_active {
-        match request.auth.auth_type.as_str() {
-            "bearer" => request_builder = request_builder.bearer_auth(&request.auth.token),
-            "basic" => {
-                request_builder =
-                    request_builder.basic_auth(request.auth.username, Some(request.auth.password))
-            }
-            "noauth" => {}
-            _ => return Err("Unsupported authentication type".to_string()),
-        }
+    if request.method.to_lowercase().as_str() == "get" {
+        return helper::send_get_request(request).await;
     }
-
-    let response = request_builder.send().map_err(|e| e.to_string())?;
-
-    let status_code = response.status().as_u16();
-    let success = response.status().is_success();
-    let headers = response
-        .headers()
-        .iter()
-        .map(|(k, v)| (k.to_string(), v.to_str().unwrap_or("").to_string()))
-        .collect::<HashMap<_, _>>();
-
-    let message = response.text().map_err(|e| e.to_string())?;
-
-    let json_response = JsonResponse {
-        success,
-        message,
-        status_code,
-        headers,
-    };
-
-    Ok(json_response)
+    if request.method.to_lowercase().as_str() == "post" {
+        return helper::send_post_request(request).await;
+    }
+    if request.method.to_lowercase().as_str() == "put" {
+        return helper::send_put_request(request).await;
+    }
+    return Err(String::from("Unsupported HTTP method"));
 }
 
 #[tauri::command]

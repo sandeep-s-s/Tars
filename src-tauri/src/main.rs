@@ -6,6 +6,9 @@ extern crate diesel;
 extern crate diesel_migrations;
 
 mod db;
+mod utils;
+mod models;
+mod schema;
 
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./migrations");
