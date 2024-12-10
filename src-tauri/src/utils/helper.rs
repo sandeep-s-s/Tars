@@ -44,6 +44,18 @@ pub async fn send_get_request(request: RequestObject) -> Result<JsonResponse, St
 
     request_builder = request_builder.query(&query_params).headers(req_headers);
 
+    if request.auth.auth_active {
+        match request.auth.auth_type.as_str() {
+            "bearer" => request_builder = request_builder.bearer_auth(&request.auth.token),
+            "basic" => {
+                request_builder =
+                    request_builder.basic_auth(request.auth.username, Some(request.auth.password))
+            }
+            "noauth" => {}
+            _ => return Err("Unsupported authentication type".to_string()),
+        }
+    }
+
     match request_builder.send().await {
         Ok(response) => {
             let status_code = response.status().as_u16();
@@ -132,6 +144,18 @@ pub async fn send_post_request(request: RequestObject) -> Result<JsonResponse, S
             }
         })
         .collect();
+
+    if request.auth.auth_active {
+        match request.auth.auth_type.as_str() {
+            "bearer" => request_builder = request_builder.bearer_auth(&request.auth.token),
+            "basic" => {
+                request_builder =
+                    request_builder.basic_auth(request.auth.username, Some(request.auth.password))
+            }
+            "noauth" => {}
+            _ => return Err("Unsupported authentication type".to_string()),
+        }
+    }
 
     request_builder = request_builder.query(&query_params).headers(req_headers);
 
@@ -226,6 +250,17 @@ pub async fn send_put_request(request: RequestObject) -> Result<JsonResponse, St
 
     request_builder = request_builder.query(&query_params).headers(req_headers);
 
+    if request.auth.auth_active {
+        match request.auth.auth_type.as_str() {
+            "bearer" => request_builder = request_builder.bearer_auth(&request.auth.token),
+            "basic" => {
+                request_builder =
+                    request_builder.basic_auth(request.auth.username, Some(request.auth.password))
+            }
+            "noauth" => {}
+            _ => return Err("Unsupported authentication type".to_string()),
+        }
+    }
     match request_builder.send().await {
         Ok(response) => {
             let status_code = response.status().as_u16();
@@ -253,7 +288,6 @@ pub async fn send_put_request(request: RequestObject) -> Result<JsonResponse, St
         Err(e) => Err(format!("Request failed: {}", e)),
     }
 }
-
 
 pub fn get_form_data(form_data_request: Vec<FormDaum>) -> multipart::Form {
     let mut form = multipart::Form::new();
