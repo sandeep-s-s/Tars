@@ -3,8 +3,8 @@
 </script>
 
 <div class="response-container">
-    {#if response}
+    {#if response.message}
         <pre>{response.message}</pre>
-        <pre>{JSON.stringify(response, null, 2)}</pre>
+        <!-- <pre>{JSON.stringify(response, null, 2)}</pre> -->
     {/if}
 </div>
