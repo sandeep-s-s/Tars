@@ -77,30 +77,34 @@ pub fn create_request(name: String, uuid: String) -> Requests {
         .first(connection) // Load the first matching record
         .expect("Error loading collection"); //
 
-    let requestJson = r#"{
-        "v": "1",
-        "endpoint": "",
-        "name": "Untitled Request",
-        "params": [],
-        "headers": [],
-        "method": "GET",
-        "auth": {
-            "authType": "",
-            "authActive": false,
-            "username": "",
-            "password": "",
-            "token": ""
-        },
-        "preRequestScript": "",
-        "testScript": "",
-        "body": {
-            "contentType": null,
-            "body": null
-        }
-    }"#;
+    let request_json = r#"{
+                    "v": "1",
+                    "endpoint": "https://httpbin.org/post",
+                    "name": "Get-req",
+                    "params": [],
+                    "headers": [],
+                    "method": "GET",
+                    "auth": {
+                        "authType": "basic",
+                        "authActive": false,
+                        "username": "",
+                        "password": "",
+                        "token": ""
+                    },
+                    "preRequestScript": "",
+                    "testScript": "",
+                    "body": {
+                        "mode": "None",
+                        "formData": [],
+                        "xWwwFormUrlencoded": [],
+                        "rawType": "Json",
+                        "raw": "",
+                        "fromData": []
+                    }
+                    }"#;
     let new_request: NewRequest = NewRequest {
         name: name,
-        request_data: requestJson.to_string(),
+        request_data: request_json.to_string(),
         uuid: String::from(&request_uuid),
         collection_id: collection.id,
     };

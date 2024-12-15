@@ -31,7 +31,7 @@
 
 <div class="auth-tab-container">
 	<div class="mt-2 col-4">
-		<label for="authType" class="form-label">Auth Type</label>
+		<label for="authType" class="form-label">Type</label>
 		<select
 			bind:value={selectedOption}
 			on:change={handleOptionChange}

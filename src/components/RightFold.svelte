@@ -24,7 +24,5 @@
         border-left: 1px solid whitesmoke;
         padding: 10px;
         margin: 10px;
-        background-color: #eaf1fb;
-
     }
 </style>
