@@ -41,3 +41,7 @@ vite.config.ts.timestamp-*
 arya.db
 src/node_modules
 package-lock.json
+
+
+
+src-tauri/Cargo.lock
