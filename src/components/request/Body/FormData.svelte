@@ -22,14 +22,17 @@
         const newObject = {
             key: "",
             value: "",
-            type: "",
+            type: "text",
             checked: false,
             src: "",
         };
 
         const updatedFormData = [...formData, newObject];
+        console.table(updatedFormData)
 
         request["body"].formData = updatedFormData;
+        console.log("form-data")
+        console.table(request["body"].formData)
     };
 
     const removeField = () => {

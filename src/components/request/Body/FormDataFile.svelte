@@ -41,9 +41,9 @@
             src: "",
         };
 
-        const updatedFormData = [...formData, newObject];
+        const updatedFormDataFile = [...formData, newObject];
 
-        request["body"].formData = updatedFormData;
+        request["body"].formData = updatedFormDataFile;
     };
 
     const removeField = () => {
