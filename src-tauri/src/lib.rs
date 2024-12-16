@@ -18,7 +18,7 @@ pub fn run() {
             cmd::get_request,
             cmd::save_request,
             cmd::send_request,
-            cmd::get_absolute_path
+            cmd::toggle_collection
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -14,9 +14,11 @@
 	let collections = [{}];
 	// Function to toggle the visibility of files
 	// folder.isOpen = true
-	function toggleFiles(collection) {
+	function toggleCollection(collection) {
+		uuid = collection.uuid;
 		collection.is_open = !collection.is_open;
 		collections = [...collections];
+		invoke("toggle_collection",{uuid});
 	}
 
 	let response = {};
@@ -70,7 +72,7 @@
 							: 'fas fa-folder'}"
 					></i>
 				</div>
-				<div class="collection-name" on:click={() => toggleFiles(collection)}>
+				<div class="collection-name" on:click={() => toggleCollection(collection)}>
 					{collection.name} 
 				</div>
 				<span class="add-request-icon" on:click={() => loadRequestModal(collection.uuid) }><i class="fa fa-plus-square" aria-hidden="true"></i></span>
