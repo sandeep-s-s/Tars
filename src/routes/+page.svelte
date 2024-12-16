@@ -5,9 +5,7 @@
   import RightFold from "../components/RightFold.svelte";
 
   let requestUUid = "";
-  function handleRequestChange(event) {
-    requestUUid = event.detail; // Update the variable based on the event
-  }
+  let response = {};
 </script>
 
 <Header />
@@ -16,11 +14,11 @@
     <Sidebar />
   </div> -->
   <div class="leftFold">
-    <!-- <LeftFold bind:requestUUid={requestUUid}/> -->
-    <LeftFold on:requestUuid={handleRequestChange} />
+    <LeftFold bind:requestUUid bind:response/>
+    <!-- <LeftFold on:requestUuid={handleRequestChange} /> -->
   </div>
   <div class="rightFold">
-    <RightFold {requestUUid} />
+    <RightFold {requestUUid} bind:response/>
   </div>
 </div>
 

@@ -2,7 +2,7 @@
     import Request from "./Request.svelte";
     import Response from "./Response.svelte";
     export let requestUUid = "";
-    let response = {};
+    export let response = {};
 </script>
 
 <div class="right-fold-container">

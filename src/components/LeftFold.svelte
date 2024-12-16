@@ -12,8 +12,7 @@
 	let showModal = false;
 
 	let collections = [{}];
-	// Function to toggle the visibility of files
-	// folder.isOpen = true
+
 	function toggleCollection(collection) {
 		uuid = collection.uuid;
 		collection.is_open = !collection.is_open;
@@ -21,7 +20,7 @@
 		invoke("toggle_collection",{uuid});
 	}
 
-	let response = {};
+	export let response = {};
 	let name = "";
 	async function createCollection() {
 		response = await invoke("create_collection", { name });
@@ -45,8 +44,7 @@
 
 	function loadRequest(requestUuid) {
 		requestUUid = requestUuid
-		dispatch('requestUuid', requestUUid);
-		// console.log(requestUUid)
+		response = "";
 	}
 
 	function loadRequestModal(collectionUuid){
@@ -122,7 +120,6 @@
 
 	.collection {
 		display: flex;
-		/* justify-content: space-between; */
 	}
 	.collection {
 		cursor: pointer;
