@@ -1,10 +1,19 @@
 <script>
+    import ResponseNav from "./response/ResponseNav.svelte";
+
+
     export let response = {};
 </script>
 
-<div class="response-container">
+<!-- <div class="response-container">
+    <h3>Response</h3>
     {#if response.message}
-        <pre>{response.message}</pre>
-        <!-- <pre>{JSON.stringify(response, null, 2)}</pre> -->
+        <span>Status : {response.status_code}</span>
+        <pre>  {response.message} </pre>
     {/if}
-</div>
+</div> -->
+
+<style>
+</style>
+
+<ResponseNav {response}/>

@@ -12,9 +12,9 @@
 
 <Header />
 <div class="container">
-  <div class="sidebar">
+  <!-- <div class="sidebar">
     <Sidebar />
-  </div>
+  </div> -->
   <div class="leftFold">
     <!-- <LeftFold bind:requestUUid={requestUUid}/> -->
     <LeftFold on:requestUuid={handleRequestChange} />

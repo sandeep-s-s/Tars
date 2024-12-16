@@ -129,8 +129,8 @@
 	.requests {
 		padding-left: 20px; 
 		padding: .1875rem .5rem;
-		margin-top: .125rem;
-		margin-left: 1.25rem;
+		margin-top: 1rem;
+		margin-left: -150px;
 		/* color: rgba(0,0,0,0.65); */
 		text-decoration: none;
 	}
