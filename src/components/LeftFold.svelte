@@ -7,6 +7,7 @@
 
 	const dispatch = createEventDispatcher();
 
+
 	export let requestUUid = ""
 	// For Modal
 	let showModal = false;
@@ -35,11 +36,12 @@
 	});
 
 	let requestFormModel = false
-	let request_name = ""
+	let rname = ""
 	let uuid = ""
 	async function createRequest() {
-		response = await invoke("create_request",{name,uuid})	
+		response = await invoke("create_request",{rname,uuid})	
 		getAllCollections()
+	
 	}
 
 	function loadRequest(requestUuid) {
@@ -103,7 +105,7 @@
 <Modal bind:showModal={requestFormModel}>
 	<h2 slot="header">New Request</h2>
 	<form on:submit={() => createRequest}>
-		<input type="text"  class="form-control" placeholder="request Name" bind:value={name} />
+		<input type="text"  class="form-control" placeholder="request Name" bind:value={rname} />
 		<button
 			class="btn btn-outline-danger"
 			type="submit"

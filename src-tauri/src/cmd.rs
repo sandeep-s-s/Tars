@@ -67,7 +67,7 @@ pub async fn get_collections() -> Vec<CollectionWithRequests> {
 }
 
 #[tauri::command]
-pub fn create_request(name: String, uuid: String) -> Requests {
+pub fn create_request(rname: String, uuid: String) -> Requests {
     use crate::schema::*;
     let connection = &mut db::establish_connection();
     let request_uuid = Uuid::new_v4().hyphenated().to_string();
@@ -104,7 +104,7 @@ pub fn create_request(name: String, uuid: String) -> Requests {
                     }
                     }"#;
     let new_request: NewRequest = NewRequest {
-        name: name,
+        name: rname,
         request_data: request_json.to_string(),
         uuid: String::from(&request_uuid),
         collection_id: collection.id,
