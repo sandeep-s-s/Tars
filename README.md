@@ -25,7 +25,7 @@ Arya uses a number of open source projects to work properly:
 
 ## Installation
 
-Dillinger requires [Node.js](https://nodejs.org/) v20+ to run.
+Arya requires [Node.js](https://nodejs.org/) v20+ to run.
 
 ```sh
 git clone https://github.com/sandeep-s-s/Arya.git
