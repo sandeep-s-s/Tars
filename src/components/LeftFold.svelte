@@ -26,6 +26,8 @@
 	async function createCollection() {
 		response = await invoke("create_collection", { name });
 		collections = [...collections, response];
+		showModal = false;
+		name = ""
 	}
 
 	async function getAllCollections(){
@@ -41,6 +43,8 @@
 	async function createRequest() {
 		response = await invoke("create_request",{rname,uuid})	
 		getAllCollections()
+		rname = ""
+		requestFormModel = false;
 	
 	}
 
