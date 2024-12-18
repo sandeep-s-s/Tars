@@ -1,6 +1,6 @@
 <script>
     export let items = {};
-    export let activeTabValue = 0;
+    let activeTabValue = 0;
     export let response = items["response"];
 
     const handleClick = (tabValue) => () => {
@@ -56,6 +56,6 @@
     }
 
     .active {
-        background-color: #04aa6d;
+        background-color:  #C70039 ;
     }
 </style>
