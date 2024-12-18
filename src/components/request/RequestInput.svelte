@@ -3,6 +3,9 @@
   export let request = {};
   export let requestUUid = ""
   export let response = {}
+
+  let loading = false;
+
   let methods = [
     { id: 1, text: "GET", default: true },
     { id: 2, text: "POST", default: false },
@@ -18,10 +21,12 @@
     let response = await invoke("save_request", { uuid, request });
   }
   async function sendRequest(request) {
-    console.log(request)
+    loading = true;
+    // console.log(request)
     request = JSON.stringify(request);
     response = await invoke("send_request", {  request });
-    console.log(response)
+    // console.log(response)
+    loading = false;
   }
 </script>
 
@@ -52,6 +57,9 @@
   </div>
 </div>
 
+{#if loading}
+  <p>Loading...</p> <!-- Show loading message -->
+{/if}
 <!-- </form> -->
 
 <style>

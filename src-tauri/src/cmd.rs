@@ -28,6 +28,7 @@ pub fn create_collection(name: String) -> Collection {
     let new_collection = NewCollection {
         name: name,
         uuid: String::from(&uuid),
+        is_open: false,
     };
     diesel::insert_into(collections::table)
         .values(&new_collection)
@@ -66,7 +67,7 @@ pub async fn get_collections() -> Vec<CollectionWithRequests> {
 }
 
 #[tauri::command]
-pub fn create_request(name: String, uuid: String) -> Requests {
+pub fn create_request(rname: String, uuid: String) -> Requests {
     use crate::schema::*;
     let connection = &mut db::establish_connection();
     let request_uuid = Uuid::new_v4().hyphenated().to_string();
@@ -103,7 +104,7 @@ pub fn create_request(name: String, uuid: String) -> Requests {
                     }
                     }"#;
     let new_request: NewRequest = NewRequest {
-        name: name,
+        name: rname,
         request_data: request_json.to_string(),
         uuid: String::from(&request_uuid),
         collection_id: collection.id,
@@ -155,12 +156,23 @@ pub async fn send_request(request: String) -> Result<JsonResponse, String> {
 }
 
 #[tauri::command]
-pub fn get_absolute_path(file_path: String) -> String {
-    // Convert the file path to a PathBuf
-    let path = PathBuf::from(file_path);
+pub fn toggle_collection(uuid: String) -> Collection {
 
-    // Return the absolute path as a string
-    path.canonicalize()
-        .map(|p| p.to_string_lossy().into_owned())
-        .unwrap_or_else(|_| "Invalid path".to_string())
+    let collection_uuid = uuid.clone();
+    let connection = &mut db::establish_connection();
+
+    let collection: models::Collection = schema::collections::table
+        .filter(schema::collections::uuid.eq(uuid)) 
+        .select(Collection::as_select())
+        .first(connection) 
+        .expect("Error loading request"); 
+
+    let toggle_is_open = !collection.is_open;
+
+    diesel::update(schema::collections::table)
+        .filter(schema::collections::dsl::uuid.eq(collection_uuid))
+        .set(schema::collections::dsl::is_open.eq(toggle_is_open))
+        .returning(Collection::as_returning())
+        .get_result(connection)
+        .expect("Error in updating request")
 }

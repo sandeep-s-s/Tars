@@ -3,53 +3,56 @@
 	import { onMount } from "svelte";
 	import Modal from "../Util/Modal.svelte";
 
-	import { createEventDispatcher } from 'svelte';
+	let activeRequestUuid = null; // request active class
 
-	const dispatch = createEventDispatcher();
-
-	export let requestUUid = ""
+	export let requestUUid = "";
 	// For Modal
 	let showModal = false;
 
 	let collections = [{}];
-	// Function to toggle the visibility of files
-	// folder.isOpen = true
-	function toggleFiles(collection) {
+
+	function toggleCollection(collection) {
+		uuid = collection.uuid;
 		collection.is_open = !collection.is_open;
 		collections = [...collections];
+		invoke("toggle_collection", { uuid });
 	}
 
-	let response = {};
+	export let response = {};
 	let name = "";
 	async function createCollection() {
 		response = await invoke("create_collection", { name });
 		collections = [...collections, response];
+		showModal = false;
+		name = "";
 	}
 
-	async function getAllCollections(){
+	async function getAllCollections() {
 		collections = await invoke("get_collections");
 	}
 	onMount(async () => {
 		getAllCollections();
 	});
 
-	let requestFormModel = false
-	let request_name = ""
-	let uuid = ""
+	let requestFormModel = false;
+	let rname = "";
+	let uuid = "";
 	async function createRequest() {
-		response = await invoke("create_request",{name,uuid})	
-		getAllCollections()
+		response = await invoke("create_request", { rname, uuid });
+		getAllCollections();
+		rname = "";
+		requestFormModel = false;
 	}
 
-	function loadRequest(requestUuid) {
-		requestUUid = requestUuid
-		dispatch('requestUuid', requestUUid);
-		// console.log(requestUUid)
+	function loadRequest(uuid) {
+		requestUUid = uuid;
+		activeRequestUuid = uuid;
+		response = "";
 	}
 
-	function loadRequestModal(collectionUuid){
+	function loadRequestModal(collectionUuid) {
 		requestFormModel = true;
-		uuid = collectionUuid
+		uuid = collectionUuid;
 	}
 </script>
 
@@ -70,15 +73,29 @@
 							: 'fas fa-folder'}"
 					></i>
 				</div>
-				<div class="collection-name" on:click={() => toggleFiles(collection)}>
-					{collection.name} 
+				<div
+					class="collection-name"
+					on:click={() => toggleCollection(collection)}
+				>
+					{collection.name}
 				</div>
-				<span class="add-request-icon" on:click={() => loadRequestModal(collection.uuid) }><i class="fa fa-plus-square" aria-hidden="true"></i></span>
+				<span
+					class="add-request-icon"
+					on:click={() => loadRequestModal(collection.uuid)}
+					><i class="fa fa-plus-square" aria-hidden="true"></i></span
+				>
 				{#if collection.is_open}
 					<div class="requests">
 						{#each collection.requests as request}
-							<div class="request">
-								<span on:click={() => loadRequest(request.uuid)}>{request.name}</span>
+							<div
+								class="request {activeRequestUuid ===
+								request.uuid
+									? 'active'
+									: ''} "
+							>
+								<span on:click={() => loadRequest(request.uuid)}
+									>{request.name}</span
+								>
 							</div>
 						{/each}
 					</div>
@@ -91,19 +108,25 @@
 <Modal bind:showModal>
 	<h2 slot="header">Collection</h2>
 	<form on:submit={() => createCollection()}>
-		<input type="text" class="form-control" placeholder="collection Name" bind:value={name} />
-		<button
-			class="btn btn-outline-danger"
-			type="submit"
-			>Create</button
-		>
+		<input
+			type="text"
+			class="form-control"
+			placeholder="collection Name"
+			bind:value={name}
+		/>
+		<button class="btn btn-outline-danger" type="submit">Create</button>
 	</form>
 </Modal>
 
 <Modal bind:showModal={requestFormModel}>
 	<h2 slot="header">New Request</h2>
 	<form on:submit={() => createRequest}>
-		<input type="text"  class="form-control" placeholder="request Name" bind:value={name} />
+		<input
+			type="text"
+			class="form-control"
+			placeholder="request Name"
+			bind:value={rname}
+		/>
 		<button
 			class="btn btn-outline-danger"
 			type="submit"
@@ -112,7 +135,6 @@
 	</form>
 </Modal>
 
-
 <style>
 	.leftFoldContainer {
 		margin: 15px;
@@ -120,15 +142,14 @@
 
 	.collection {
 		display: flex;
-		/* justify-content: space-between; */
 	}
 	.collection {
 		cursor: pointer;
 		margin: 5px 0;
 	}
 	.requests {
-		padding-left: 20px; 
-		padding: .1875rem .5rem;
+		padding-left: 20px;
+		padding: 0.1875rem 0.5rem;
 		margin-top: 1rem;
 		margin-left: -150px;
 		/* color: rgba(0,0,0,0.65); */
@@ -138,7 +159,12 @@
 		margin-top: 15px;
 		margin-bottom: 15px;
 	}
-	.add-request-icon{
+	.add-request-icon {
 		margin-right: 50px;
+	}
+	.request.active {
+		background-color: #333;
+		border-color: #333;
+		color: #fff;
 	}
 </style>

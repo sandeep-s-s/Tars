@@ -8,6 +8,7 @@ use std::collections::HashMap;
 pub struct NewCollection {
     pub name: String,
     pub uuid: String,
+    pub is_open: bool
 }
 
 // #[derive(Queryable, Selectable, Serialize, Deserialize)]
