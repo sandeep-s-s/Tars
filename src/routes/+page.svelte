@@ -9,50 +9,16 @@
 </script>
 
 <Header />
-<div class="container">
-  <!-- <div class="sidebar">
-    <Sidebar />
-  </div> -->
-  <div class="leftFold">
-    <LeftFold bind:requestUUid bind:response/>
-    <!-- <LeftFold on:requestUuid={handleRequestChange} /> -->
-  </div>
-  <div class="rightFold">
-    <RightFold {requestUUid} bind:response/>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-2">
+      <LeftFold bind:requestUUid bind:response />
+    </div>
+    <div class="col-10">
+      <RightFold {requestUUid} bind:response />
+    </div>
   </div>
 </div>
 
 <style>
-  * {
-    padding: 0;
-    margin: 0;
-  }
-  .container {
-    display: flex;
-    height: 100vh;
-    /* width: 100%; */
-  }
-  .sidebar {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    border-right: 1px solid whitesmoke;
-    background-color: #eaf1fb;
-  }
-  .leftFold {
-    display: flex;
-    flex: 3;
-    flex-direction: column;
-    align-items: flex-start;
-    border-right: 1px solid whitesmoke;
-  }
-  .rightFold {
-    /* display: flex; */
-    flex: 11;
-    /* align-items: center; */
-    /* justify-content: flex-start; */
-    border-right: 1px solid whitesmoke;
-  }
 </style>

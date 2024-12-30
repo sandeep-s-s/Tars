@@ -61,14 +61,14 @@
 						type="checkbox"
 						bind:checked={v.checked}
 						on:change={(e) => addChecked(i)}
-						title="Select"
+						title="Select" class="form-check-input"
 					/>
 				</div>
 				<div class="col-2">
 					<button
 						on:click={(e) => deleteElement(i)}
-						class="btn btn-outline-danger"
-						title="Delete">Delete</button
+						class="btn btn-dark btn-sm"
+						title="Delete"><i class="bi bi-trash"></i></button
 					>
 				</div>
 			</div>

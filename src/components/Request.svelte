@@ -15,7 +15,7 @@
 	$: loadRequest(requestUUid);
 </script>
 
-<div class="col">
+<div class="">
 	<RequestInput
 		{request} {requestUUid}
 		bind:method={request.method}

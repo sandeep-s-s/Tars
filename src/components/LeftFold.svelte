@@ -26,6 +26,7 @@
 		response = await invoke("create_collection", { name });
 		collections = [...collections, response];
 		showCreateCollectionModal = false;
+		// showPopup = false;
 		name = "";
 	}
 
@@ -68,16 +69,124 @@
 
 		collections = collections.map((item) => {
 			if (item.uuid === uuid) {
-				return { ...item, name: name }; 
+				return { ...item, name: name };
 			}
-			return item; 
+			return item;
 		});
 		showRenameCollectionModal = false;
 		name = "";
 	}
+
+	const onShowPopup = (ev) => {
+		showCreateCollectionModal = true;
+	};
+
+	const onPopupClose = (data) => {
+		showCreateCollectionModal = false;
+	};
 </script>
 
-<div class="leftFoldContainer">
+<div class="sidebar" style="border-right: 1px solid #ccc;">
+	<div class="collection"></div>
+	<div class="mt-2">
+		<h5>Collections</h5>
+	</div>
+	<hr />
+	<div class="collection">
+		<!-- <ul class="nav d-flex justify-content-end"> -->
+		<ul class="nav">
+			<li class="nav-item">
+				<button class="btn btn-dark btn-sm" on:click={onShowPopup}>
+					<i class="bi bi-plus-square"></i> New Collection
+				</button>
+			</li>
+		</ul>
+	</div>
+	<div class="list-group mt-2">
+		<!-- {#each data.slice(0, 4) as folder, index} -->
+		{#each collections as collection, index}
+			<!-- Limit to 4 folders -->
+			<div class="list-group-item">
+				<div class="d-flex justify-content-between align-items-center">
+					<!-- svelte-ignore a11y-click-events-have-key-events -->
+					<!-- svelte-ignore a11y-no-static-element-interactions -->
+					<!-- svelte-ignore a11y-missing-attribute -->
+					<a class="" on:click={() => toggleCollection(collection)}>
+						<i
+							class="folder-icon {collection.is_open
+								? 'bi bi-folder2-open'
+								: 'bi bi-folder-fill'}"
+						>
+						</i>
+						<strong>{collection.name} </strong>
+					</a>
+					<div class="dropdown">
+						<button
+							type="button"
+							class="btn"
+							data-bs-toggle="dropdown"
+						>
+							<i class="bi bi-three-dots-vertical"></i>
+						</button>
+						<ul class="dropdown-menu">
+							<li>
+								<a
+									class="dropdown-item"
+									href="#"
+									on:click={() =>
+										renameCollectionModal(collection)}
+									>Rename Collection</a
+								>
+							</li>
+						</ul>
+					</div>
+				</div>
+				{#if collection.is_open}
+					{#each collection.requests as request}
+						<div class="list-group-item">
+							<div
+								class="d-flex justify-content-between align-items-center active"
+							>
+								<!-- svelte-ignore a11y-click-events-have-key-events -->
+								<!-- svelte-ignore a11y-no-static-element-interactions -->
+								<!-- svelte-ignore a11y-missing-attribute -->
+								<a
+									class=""
+									on:click={() => loadRequest(request.uuid)}
+								>
+									<i class="bi bi-file-earmark-text-fill"></i>
+									<span
+										class="
+									{activeRequestUuid === request.uuid ? 'text-primary' : ''}">{request.name}</span
+									>
+								</a>
+								<div class="dropdown">
+									<button
+										type="button"
+										class="btn"
+										data-bs-toggle="dropdown"
+									>
+										<i class="bi bi-three-dots-vertical"
+										></i>
+									</button>
+									<ul class="dropdown-menu">
+										<li>
+											<a class="dropdown-item" href="#"
+												>Link 1</a
+											>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					{/each}
+				{/if}
+			</div>
+		{/each}
+	</div>
+</div>
+
+<!-- <div class="leftFoldContainer">
 	<div class="collectionButton">
 		<button
 			class="btn btn-outline-danger"
@@ -131,28 +240,9 @@
 									? 'active'
 									: ''} "
 							>
-								<div on:click={() => loadRequest(request.uuid)}
-									>{request.name}</div
-								>
-								<!-- <div class="collection-settings-icon">
-									<div class="dropdown" style="float:left;">
-										<i class="fa fa-plus-square" aria-hidden="true"></i>
-										<div class="dropdown-content" style="left:0;">
-											<a
-												href="#"
-												on:click={() =>
-													loadRequestModal(collection.uuid)}
-												>New Request</a
-											>
-											<a
-												href="#"
-												on:click={() =>
-													renameCollectionModal(collection)}
-												>Rename</a
-											>
-										</div>
-									</div>
-								</div> -->
+								<div on:click={() => loadRequest(request.uuid)}>
+									{request.name}
+								</div>
 							</div>
 						{/each}
 					</div>
@@ -160,11 +250,11 @@
 			</div>
 		{/each}
 	</div>
-</div>
+</div> -->
 
-<!--  Create Collection Modal -->
-<Modal bind:showModal={showCreateCollectionModal}>
-	<h2 slot="header">Collection</h2>
+<!-- Create Collection Modal -->
+<Modal open={showCreateCollectionModal} onClosed={(data) => onPopupClose(data)}>
+	<h5 slot="header">New Collection</h5>
 	<form on:submit={() => createCollection()}>
 		<input
 			type="text"
@@ -172,14 +262,19 @@
 			placeholder="collection Name"
 			bind:value={name}
 		/>
-		<button class="btn btn-outline-danger" type="submit">Create</button>
 	</form>
+	<button
+		slot="action"
+		class="btn btn-dark btn-sm"
+		type="submit"
+		on:click={() => createCollection()}>Create</button
+	>
 </Modal>
-<!-- Create Collection Modal end here -->
+<!-- Create Collection Modal ends here -->
 
-<!--  Modify Collection Modal -->
-<Modal bind:showModal={showRenameCollectionModal}>
-	<h2 slot="header">Collection</h2>
+<!-- Rename Collection Modal -->
+<Modal open={showRenameCollectionModal} onClosed={(data) => onPopupClose(data)}>
+	<h5 slot="header">Rename Collection</h5>
 	<form on:submit={() => renameCollection()}>
 		<input
 			type="text"
@@ -187,71 +282,36 @@
 			placeholder="collection Name"
 			bind:value={name}
 		/>
-		<button class="btn btn-outline-danger" type="submit">Rename</button>
 	</form>
-</Modal>
-<!-- Modify Collection Modal end here -->
-
-<Modal bind:showModal={requestFormModel}>
-	<h2 slot="header">New Request</h2>
-	<form on:submit={() => createRequest}>
-		<input
-			type="text"
-			class="form-control"
-			placeholder="request Name"
-			bind:value={rname}
-		/>
-		<button
-			class="btn btn-outline-danger"
-			type="submit"
-			on:click={() => createRequest()}>Create</button
-		>
-	</form>
+	<button
+		slot="action"
+		class="btn btn-dark btn-sm"
+		type="submit"
+		on:click={() => renameCollection()}>Rename</button
+	>
 </Modal>
 
+<!-- Rename Collection Modal ends here -->
 <style>
-	.leftFoldContainer {
-		margin: 15px;
+	.list-group-item {
+		border: none; /* Remove border */
 	}
-
-	.collection {
-		display: flex;
-		cursor: pointer;
-		margin: 5px 0;
-	}
-	.collection-icon {
-		flex: 1;
-	}
-	.collection-name-container {
-		flex: 10;
-		display: flex;
-	}
-	.collection-name {
-		flex: 9;
-	}
-
-	.collection-settings-icon {
-		margin-right: 50px;
-	}
-
-	/* .requests {
-		padding-left: 20px;
-		padding: 0.1875rem 0.5rem;
-		margin-top: 1rem;
-	
+	a,
+	a:hover,
+	a:focus,
+	a:active {
 		text-decoration: none;
-	} */
-	.collectionButton {
-		margin-top: 15px;
-		margin-bottom: 15px;
+		color: inherit;
+		cursor: pointer;
 	}
-	.request.active {
-		background-color: #333;
-		border-color: #333;
-		color: #fff;
+
+	.sidebar {
+		height: 100%;
+		background-color: #f8f9fa;
+		padding-top: 20px;
+		position: fixed;
 	}
-	.request-name-container {
-		/* display: flex; */
-		/* flex-direction: row; */
+	.active {
+		/* background-color: #777; */
 	}
 </style>

@@ -16,12 +16,6 @@
 	];
 	items["request"] = request
 </script>
-<div class="request-tab-container">
+<div class="mt-2">
 	<RequestTabs {items}  bind:request={request}/>
 </div>
-
-<style>
-	.request-tab-container{
-		margin-top: 10px;
-	}
-</style>

@@ -1,70 +1,57 @@
 <script>
-	export let showModal;
+	export let open = false;
+	export let onClosed;
 
-	let dialog;
-
-	$: if (dialog && showModal) {
-		dialog.showModal();
-	} else if (dialog) {
-		dialog.close();
-	}
+	const modalClose = (data) => {
+		open = false;
+		if (onClosed) {
+			onClosed(data);
+		}
+	};
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
-<dialog
-	bind:this={dialog}
-	on:close={() => (showModal = false)}
-	on:click|self={() => dialog.close()}
->
-	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div on:click|stopPropagation>
-		<slot name="header" />
-		<hr />
-		<slot />
-		<hr />
-		<!-- svelte-ignore a11y-autofocus -->
-		<button autofocus on:click={() => dialog.close()} class="btn"
-			>close modal</button
-		>
+{#if open}
+	<div
+		class="modal"
+		id="sampleModal"
+		tabindex="-1"
+		role="dialog"
+		aria-labelledby="sampleModalLabel"
+		aria-hidden={false}
+	>
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<slot name="header" />
+				</div>
+				<div class="modal-body">
+					<slot></slot>
+				</div>
+				<div class="modal-footer">
+					<button
+						type="button"
+						class="btn btn-light btn-sm"
+						data-dismiss="modal"
+						on:click={() => modalClose("close")}>Close</button
+					>
+
+					<slot name="action" />
+					<!-- <button
+						type="button"
+						class="btn btn-primary btn-sm"
+						on:click={() => modalClose("save")}>Save changes</button
+					> -->
+				</div>
+			</div>
+		</div>
 	</div>
-</dialog>
+{/if}
 
 <style>
-	dialog {
-		max-width: 32em;
-		border-radius: 0.2em;
-		border: none;
-		padding: 0;
-	}
-	dialog::backdrop {
-		background: rgba(0, 0, 0, 0.3);
-	}
-	dialog > div {
-		padding: 1em;
-	}
-	dialog[open] {
-		animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-	}
-	@keyframes zoom {
-		from {
-			transform: scale(0.95);
-		}
-		to {
-			transform: scale(1);
-		}
-	}
-	dialog[open]::backdrop {
-		animation: fade 0.2s ease-out;
-	}
-	@keyframes fade {
-		from {
-			opacity: 0;
-		}
-		to {
-			opacity: 1;
-		}
-	}
-	button {
+	.modal {
 		display: block;
+	}
+	.modal-content {
+		border-radius: 0;
 	}
 </style>
