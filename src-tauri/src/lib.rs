@@ -18,7 +18,8 @@ pub fn run() {
             cmd::get_request,
             cmd::save_request,
             cmd::send_request,
-            cmd::toggle_collection
+            cmd::toggle_collection,
+            cmd::rename_collection
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
