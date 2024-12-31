@@ -138,6 +138,15 @@
 									>Rename Collection</a
 								>
 							</li>
+							<li>
+								<a
+									class="dropdown-item"
+									href="#"
+									on:click={() =>
+										loadRequestModal(collection.uuid)}
+									>New Request</a
+								>
+							</li>
 						</ul>
 					</div>
 				</div>
@@ -186,71 +195,7 @@
 	</div>
 </div>
 
-<!-- <div class="leftFoldContainer">
-	<div class="collectionButton">
-		<button
-			class="btn btn-outline-danger"
-			on:click={() => (showCreateCollectionModal = true)}
-			>New Collection</button
-		>
-	</div>
-	<div class="collection-items">
-		{#each collections as collection}
-			<div class="collection">
-				<div class="collection-icon">
-					<i
-						class="folder-icon {collection.is_open
-							? 'fas fa-folder-open'
-							: 'fas fa-folder'}"
-					></i>
-				</div>
-				<div class="collection-name-container">
-					<div
-						class="collection-name"
-						on:click={() => toggleCollection(collection)}
-					>
-						{collection.name}
-					</div>
-					<div class="collection-settings-icon">
-						<div class="dropdown" style="float:left;">
-							<i class="fa fa-plus-square" aria-hidden="true"></i>
-							<div class="dropdown-content" style="left:0;">
-								<a
-									href="#"
-									on:click={() =>
-										loadRequestModal(collection.uuid)}
-									>New Request</a
-								>
-								<a
-									href="#"
-									on:click={() =>
-										renameCollectionModal(collection)}
-									>Rename</a
-								>
-							</div>
-						</div>
-					</div>
-				</div>
-				{#if collection.is_open}
-					<div class="request-name-container">
-						{#each collection.requests as request}
-							<div
-								class="request {activeRequestUuid ===
-								request.uuid
-									? 'active'
-									: ''} "
-							>
-								<div on:click={() => loadRequest(request.uuid)}>
-									{request.name}
-								</div>
-							</div>
-						{/each}
-					</div>
-				{/if}
-			</div>
-		{/each}
-	</div>
-</div> -->
+
 
 <!-- Create Collection Modal -->
 <Modal open={showCreateCollectionModal} onClosed={(data) => onPopupClose(data)}>
@@ -292,6 +237,27 @@
 </Modal>
 
 <!-- Rename Collection Modal ends here -->
+
+<!-- Create new Request Modal -->
+
+<Modal open={requestFormModel} onClosed={(data) => onPopupClose(data)}>
+	<h5 slot="header">New Request</h5>
+	<form on:submit={() => createRequest()}>
+		<input
+			type="text"
+			class="form-control"
+			placeholder="Request Name"
+			bind:value={rname}
+		/>
+	</form>
+	<button
+		slot="action"
+		class="btn btn-dark btn-sm"
+		type="submit"
+		on:click={() => createRequest()}>Create</button
+	>
+</Modal>
+
 <style>
 	.list-group-item {
 		border: none; /* Remove border */
