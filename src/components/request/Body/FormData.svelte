@@ -28,11 +28,11 @@
         };
 
         const updatedFormData = [...formData, newObject];
-        console.table(updatedFormData)
+        console.table(updatedFormData);
 
         request["body"].formData = updatedFormData;
-        console.log("form-data")
-        console.table(request["body"].formData)
+        console.log("form-data");
+        console.table(request["body"].formData);
     };
 
     const removeField = () => {
@@ -48,18 +48,18 @@
     };
     const deleteElement = (index) => {
         if (index > -1) {
-            request["body"].formData.splice(index, 1); 
+            request["body"].formData.splice(index, 1);
         }
         request["body"].fromData = request["body"].formData;
     };
 </script>
 
-<h3>Form Fields</h3>
-<div class="request-form-data-container">
+<div class="mt-3">
+    <strong>Form Data</strong>
     {#if request && request["body"] && request["body"].formData}
         {#each request["body"].formData as v, i}
             {#if v.type == "text"}
-                <div class="form-data-container">
+                <div class="row mt-1">
                     <div class="col-4">
                         <input
                             id={i}
@@ -84,32 +84,28 @@
                             bind:checked={v.checked}
                             on:change={(e) => addChecked(i)}
                             title="Select"
+                            class="form-check-input"
                         />
                     </div>
                     <div class="col-2">
                         <button
                             on:click={(e) => deleteElement(i)}
-                            class="btn btn-outline-danger"
-                            title="Delete">Delete</button
+                            class="btn btn-outline-dark btn-sm"
+                            title="Delete"
+                            ><i class="bi bi-x-circle-fill"></i></button
                         >
                     </div>
                 </div>
             {/if}
         {/each}
     {/if}
+    <div class="d-flex justify-content-end mt-3">
+        <button
+            on:click|preventDefault={addField}
+            class="btn btn-dark btn-sm"
+            title="Add New"><i class="bi bi-plus-square-fill"></i> Add</button
+        >
+    </div>
 </div>
 
-<button
-    on:click|preventDefault={addField}
-    class="btn btn-outline-danger"
-    title="Add New">Add</button
->
 <FormDataFile {request} />
-
-<style>
-    .form-data-container {
-        margin: 5px;
-        display: flex;
-        gap: 15px;
-    }
-</style>

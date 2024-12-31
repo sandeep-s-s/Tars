@@ -311,7 +311,4 @@
 		padding-top: 20px;
 		position: fixed;
 	}
-	.active {
-		/* background-color: #777; */
-	}
 </style>

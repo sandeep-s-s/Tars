@@ -5,7 +5,7 @@
     export let response = {};
 </script>
 
-<div class="col-10 right-fold-container">
+<div class="right-fold-container">
     {#if requestUUid}
         <div class="row mt-5">
             <div class="col-8">

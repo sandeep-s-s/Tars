@@ -4,7 +4,7 @@
 
 <div class="response-header">
     {#if response.headers}
-        <table>
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <th>Header</th>
@@ -24,21 +24,5 @@
 </div>
 
 <style>
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    th,
-    td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
-    th {
-        background-color: #f2f2f2;
-    }
-
-    .response-header{
-        margin-top: 10px;
-    }
+  
 </style>
