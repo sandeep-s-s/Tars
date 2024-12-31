@@ -5,7 +5,7 @@
 
 <div class="basic-auth-container">
   <div class="col">
-    <label for="userName" class="form-label">User Name</label>
+    <label for="userName" class="form-label"><strong>User Name</strong></label>
     <input
       type="text"
       placeholder="Username"
@@ -14,7 +14,7 @@
     />
   </div>
   <div class="col">
-    <label for="password" class="form-label">Password</label>
+    <label for="password" class="form-label"><strong>Password</strong></label>
     <input
       type="text"
       placeholder="Password"

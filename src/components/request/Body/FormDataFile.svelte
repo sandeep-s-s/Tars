@@ -79,12 +79,12 @@
     }
 </script>
 
-<h3>Files</h3>
-<div class="request-form-data-container">
+<div class="mt-3">
+    <strong>Files</strong>
     {#if request && request["body"] && request["body"].formData}
         {#each request["body"].formData as v, i}
             {#if v.type == "file"}
-                <div class="form-data-container">
+                <div class="row mt-1">
                     <div class="col-4">
                         <input
                             id={i}
@@ -95,11 +95,11 @@
                         />
                     </div>
                     <div class="col-4">
-                        <button on:click={() => selectFile(i)}
-                            >Select File</button
+                        <button class="btn btn-outline-dark btn-sm" on:click={() => selectFile(i)}
+                            ><i class="bi bi-cloud-arrow-up-fill"></i> Upload</button
                         >
                         {#if v.src}
-                            {getFileName(v.src)}
+                           <strong> {getFileName(v.src)}</strong>
                         {/if}
                     </div>
                     <div class="col-1">
@@ -108,30 +108,26 @@
                             bind:checked={v.checked}
                             on:change={(e) => addChecked(i)}
                             title="Select"
+                            class="form-check-input"
                         />
                     </div>
                     <div class="col-2">
                         <button
                             on:click={(e) => deleteElement(i)}
-                            class="btn btn-outline-danger"
-                            title="Delete">Delete</button
+                            class="btn btn-outline-dark btn-sm"
+                            title="Delete"
+                            ><i class="bi bi-x-circle-fill"></i></button
                         >
                     </div>
                 </div>
             {/if}
         {/each}
     {/if}
+    <div class="d-flex justify-content-end mt-3">
+        <button
+            on:click|preventDefault={addField}
+            class="btn btn-dark btn-sm"
+            title="Add New"><i class="bi bi-plus-square-fill"></i> Add</button
+        >
+    </div>
 </div>
-<button
-    on:click|preventDefault={addField}
-    class="btn btn-outline-danger"
-    title="Add New">Add</button
->
-
-<style>
-    .form-data-container {
-        margin: 5px;
-        display: flex;
-        gap: 15px;
-    }
-</style>

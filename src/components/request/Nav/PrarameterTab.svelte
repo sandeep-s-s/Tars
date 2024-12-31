@@ -34,10 +34,10 @@
 	};
 </script>
 
-<div class="request-parameter-container">
+<div class="mt-3">
 	{#if request && request["params"]}
 		{#each request["params"] as v, i}
-			<div class="request-parameter">
+			<div class="row mt-1">
 				<div class="col-4">
 					<input
 						id={i}
@@ -62,34 +62,25 @@
 						bind:checked={v.checked}
 						on:change={(e) => addChecked(i)}
 						title="Select"
+						class="form-check-input"
 					/>
 				</div>
 				<div class="col-2">
 					<button
 						on:click={(e) => deleteElement(i)}
-						class="btn btn-outline-danger"
-						title="Delete">Delete</button
+						class="btn btn-outline-dark btn-sm"
+						title="Delete"
+						><i class="bi bi-x-circle-fill"></i></button
 					>
 				</div>
 			</div>
 		{/each}
 	{/if}
+	<div class="d-flex justify-content-end mt-3">
+		<button
+			on:click|preventDefault={addField}
+			class="btn btn-dark btn-sm"
+			title="Add New"><i class="bi bi-plus-square-fill"></i> Add</button
+		>
+	</div>
 </div>
-<button
-	on:click|preventDefault={addField}
-	class="btn btn-outline-danger"
-	title="Add New">Add</button
->
-
-<style>
-	.request-parameter-container {
-		margin: 5px;
-		gap: 15px;
-	}
-
-	.request-parameter {
-		margin: 5px;
-		display: flex;
-		gap: 15px;
-	}
-</style>

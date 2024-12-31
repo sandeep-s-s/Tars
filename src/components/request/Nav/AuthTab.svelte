@@ -30,8 +30,8 @@
 </script>
 
 <div class="auth-tab-container">
-	<div class="mt-2 col-4">
-		<label for="authType" class="form-label">Type</label>
+	<div class="col-4">
+		<label for="authType" class="form-label"><strong>Type</strong></label>
 		<select
 			bind:value={selectedOption}
 			on:change={handleOptionChange}

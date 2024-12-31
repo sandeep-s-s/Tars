@@ -26,7 +26,7 @@
 				<br />
 			{/each}
 		</div>
-		<textarea class="editor" bind:value={request["body"].raw} on:input={handleInput} rows="20" />
+		<textarea class="editor form-control" bind:value={request["body"].raw} on:input={handleInput} rows="20" />
 	</div>
 	{#if errorMessage}
 		<div class="error">{errorMessage}</div>

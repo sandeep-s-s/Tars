@@ -1,8 +1,8 @@
 <script>
   import { invoke } from "@tauri-apps/api/core";
   export let request = {};
-  export let requestUUid = ""
-  export let response = {}
+  export let requestUUid = "";
+  export let response = {};
 
   let loading = false;
 
@@ -14,7 +14,6 @@
 
   export let method = request["method"];
   export let endpoint = request["endpoint"];
- 
 
   async function saveRequest(uuid) {
     request = JSON.stringify(request);
@@ -24,7 +23,7 @@
     loading = true;
     // console.log(request)
     request = JSON.stringify(request);
-    response = await invoke("send_request", {  request });
+    response = await invoke("send_request", { request });
     // console.log(response)
     loading = false;
   }
@@ -45,22 +44,26 @@
     <input bind:value={endpoint} class={"form-control"} placeholder="URL" />
   </div>
   <div class="request-button">
-    <button type="submit" class="btn btn-outline-danger" on:click={() => sendRequest(request)}>Send</button>
+    <button
+      type="submit"
+      class="btn btn-dark btn-sm"
+      on:click={() => sendRequest(request)}
+      ><i class="bi bi-send-fill"></i> Send</button
+    >
   </div>
   <div class="request-button">
     <button
       type="submit"
-      class="btn btn-outline-danger"
+      class="btn btn-outline-dark btn-sm"
       on:click={() => saveRequest(requestUUid)}
-      >Save</button
+      ><i class="bi bi-floppy-fill"></i> Save</button
     >
   </div>
 </div>
-
 {#if loading}
-  <p>Loading...</p> <!-- Show loading message -->
+  <p>Loading...</p>
+  <!-- Show loading message -->
 {/if}
-<!-- </form> -->
 
 <style>
   .request-top-container {

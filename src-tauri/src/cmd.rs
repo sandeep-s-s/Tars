@@ -157,15 +157,14 @@ pub async fn send_request(request: String) -> Result<JsonResponse, String> {
 
 #[tauri::command]
 pub fn toggle_collection(uuid: String) -> Collection {
-
     let collection_uuid = uuid.clone();
     let connection = &mut db::establish_connection();
 
     let collection: models::Collection = schema::collections::table
-        .filter(schema::collections::uuid.eq(uuid)) 
+        .filter(schema::collections::uuid.eq(uuid))
         .select(Collection::as_select())
-        .first(connection) 
-        .expect("Error loading request"); 
+        .first(connection)
+        .expect("Error loading request");
 
     let toggle_is_open = !collection.is_open;
 
@@ -175,4 +174,16 @@ pub fn toggle_collection(uuid: String) -> Collection {
         .returning(Collection::as_returning())
         .get_result(connection)
         .expect("Error in updating request")
+}
+
+#[tauri::command]
+pub fn rename_collection(uuid: String, name: String) -> Collection {
+    let collection_uuid = uuid.clone();
+    let connection = &mut db::establish_connection();
+    diesel::update(schema::collections::table)
+        .filter(schema::collections::dsl::uuid.eq(collection_uuid))
+        .set(schema::collections::dsl::name.eq(name))
+        .returning(Collection::as_returning())
+        .get_result(connection)
+        .expect("Error in updating collection")
 }

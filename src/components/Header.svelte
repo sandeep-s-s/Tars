@@ -1,79 +1,37 @@
 <script>
     import arya_img from "../image/arya.png";
 </script>
-<nav class="navbar">
-    <div class="nav-icon">
-        <span class="material-icons"> menu </span>
-        <img src="{arya_img}" alt="arya logo" />
-    </div>
-    <!-- <div class="nav-input">
-        <span class="material-icons"> search </span>
-        <input type="text" name="" placeholder="Search Collections" />
-        <span class="material-icons"> arrow_drop_down </span>
-    </div> -->
-    <!-- <div class="nav-icons">
-        <span class="material-icons"> apps </span>
-        <span class="material-icons"> notifications </span>
-        <span class="material-icons"> account_circle </span>
-    </div> -->
+
+
+<nav class="navbar navbar-expand-sm navbar-light bg-light border-bottom">
+	<div class="container-fluid">
+        <!-- <img src="{arya_img}" alt="arya logo" /> -->
+		<!-- <a class="navbar-brand" href="javascript:void(0)">Arya</a> -->
+        <a class="navbar-brand" href="#">
+            <img src="{arya_img}" alt="Avatar Logo" style="width:80px;" class="rounded-pill"> 
+          </a>
+		<button
+			class="navbar-toggler"
+			type="button"
+			data-bs-toggle="collapse"
+			data-bs-target="#mynavbar"
+		>
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="mynavbar">
+			<ul class="navbar-nav me-auto">
+				<li class="nav-item">
+					<a class="nav-link" href="javascript:void(0)">Link</a>
+				</li>
+			</ul>
+			<div class="d-flex">
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link" href="javascript:void(0)"><i class="bi bi-gear-fill"></i> Settings</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
 </nav>
 
-<style>
-    * {
-        padding: 0;
-        margin: 0;
-    }
-
-    .navbar {
-        display: flex;
-        border-bottom: 1px solid whitesmoke;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .nav-icon {
-        display: flex;
-        align-items: center;
-    }
-    .nav-icon span {
-        padding: 10px;
-    }
-    .nav-icon img {
-        object-fit: contain;
-        height: 80px;
-        margin-left: 5px;
-        padding-left: 70px;
-    }
-
-    .nav-input {
-        display: flex;
-        flex: 0.7;
-        background-color: whitesmoke;
-        padding: 10px;
-        border-radius: 5px;
-        align-items: center;
-    }
-
-    .material-icons {
-        color: gray;
-    }
-
-    .nav-input input {
-        width: 100%;
-        border: none; 
-        background: none; 
-        outline: none; 
-        font: inherit; 
-        color: inherit;
-        background-color: transparent;
-        padding: 10px;
-    }
-
-    .nav-icons {
-        display: flex;
-    }
-
-    .nav-icons span {
-        padding: 10px;
-    }
-</style>
