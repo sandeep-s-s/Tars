@@ -12,14 +12,16 @@
   "app": {
     "windows": [
       {
-        "title": "arya",
+        "title": "Arya",
         "fullscreen": true,
         "height": 600,
         "resizable": true,
-        "width": 800,
+        "width": 1000,
         "alwaysOnTop": false,
         "maximized": false,
-        "decorations": false
+        "maximizable": true,
+        "minimizable": true,
+        "closable": true
       }
     ],
     "security": {
