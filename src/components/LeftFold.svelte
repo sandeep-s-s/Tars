@@ -2,6 +2,8 @@
 	import { invoke } from "@tauri-apps/api/core";
 	import { onMount } from "svelte";
 	import Modal from "../Util/Modal.svelte";
+	import { truncateString } from '../Util/util.js';
+
 
 	let activeRequestUuid = null; // request active class
 
@@ -93,7 +95,6 @@
 		rname = request.name;
 	}
 	async function renameRequest() {
-
 		response = await invoke("rename_request", { uuid, rname });
 
 		collections = collections.map((collection) => {
@@ -144,7 +145,7 @@
 								: 'bi bi-folder-fill'}"
 						>
 						</i>
-						<strong>{collection.name} </strong>
+						<strong>{truncateString(collection.name, 10)} </strong>
 					</a>
 					<div class="dropdown">
 						<button
@@ -192,7 +193,8 @@
 									<i class="bi bi-file-earmark-text-fill"></i>
 									<span
 										class="
-									{activeRequestUuid === request.uuid ? 'text-primary' : ''}">{request.name}</span
+									{activeRequestUuid === request.uuid ? 'text-primary' : ''}"
+										>{truncateString(request.name, 7)}</span
 									>
 								</a>
 								<div class="dropdown">
