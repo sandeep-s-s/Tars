@@ -2,6 +2,13 @@
 	import { invoke } from "@tauri-apps/api/core";
 	import { onMount } from "svelte";
 	import Modal from "../Util/Modal.svelte";
+	import { truncateString } from "../Util/util.js";
+
+	import { showToast } from "../storage/toastStore";
+
+	function triggerToast(message) {
+		showToast(message);
+	}
 
 	let activeRequestUuid = null; // request active class
 
@@ -27,7 +34,6 @@
 		response = await invoke("create_collection", { name });
 		collections = [...collections, response];
 		showCreateCollectionModal = false;
-		// showPopup = false;
 		name = "";
 	}
 
@@ -76,6 +82,7 @@
 		});
 		showRenameCollectionModal = false;
 		name = "";
+		triggerToast("Collection name modified");
 	}
 
 	const onShowPopup = (ev) => {
@@ -93,7 +100,6 @@
 		rname = request.name;
 	}
 	async function renameRequest() {
-
 		response = await invoke("rename_request", { uuid, rname });
 
 		collections = collections.map((collection) => {
@@ -109,6 +115,7 @@
 			return collection;
 		});
 		showRenameRequestModal = false;
+		triggerToast("Request name modified");
 	}
 </script>
 
@@ -144,7 +151,7 @@
 								: 'bi bi-folder-fill'}"
 						>
 						</i>
-						<strong>{collection.name} </strong>
+						<strong>{truncateString(collection.name, 10)} </strong>
 					</a>
 					<div class="dropdown">
 						<button
@@ -178,7 +185,7 @@
 				</div>
 				{#if collection.is_open}
 					{#each collection.requests as request}
-						<div class="list-group-item">
+						<div class="list-group-item mx-1">
 							<div
 								class="d-flex justify-content-between align-items-center active"
 							>
@@ -192,7 +199,8 @@
 									<i class="bi bi-file-earmark-text-fill"></i>
 									<span
 										class="
-									{activeRequestUuid === request.uuid ? 'text-primary' : ''}">{request.name}</span
+									{activeRequestUuid === request.uuid ? 'text-primary' : ''}"
+										>{truncateString(request.name, 7)}</span
 									>
 								</a>
 								<div class="dropdown">
@@ -313,7 +321,9 @@
 <style>
 	.list-group-item {
 		border: none; /* Remove border */
+		padding: 2px;
 	}
+
 	a,
 	a:hover,
 	a:focus,
