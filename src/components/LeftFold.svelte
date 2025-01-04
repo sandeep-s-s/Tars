@@ -10,6 +10,7 @@
 	let showCreateCollectionModal = false;
 
 	let showRenameCollectionModal = false;
+	let showRenameRequestModal = false;
 
 	let collections = [{}];
 
@@ -84,6 +85,31 @@
 	const onPopupClose = (data) => {
 		showCreateCollectionModal = false;
 	};
+
+	function loadRenameRequestModal(request) {
+		request = request;
+		showRenameRequestModal = true;
+		uuid = request.uuid;
+		rname = request.name;
+	}
+	async function renameRequest() {
+
+		response = await invoke("rename_request", { uuid, rname });
+
+		collections = collections.map((collection) => {
+			if (collection.id === response.collection_id) {
+				const request = collection.requests.find(
+					(request) => request.uuid === uuid,
+				);
+				if (request) {
+					request.name = rname;
+				}
+				return { ...collection };
+			}
+			return collection;
+		});
+		showRenameRequestModal = false;
+	}
 </script>
 
 <div class="sidebar" style="border-right: 1px solid #ccc;">
@@ -180,8 +206,13 @@
 									</button>
 									<ul class="dropdown-menu">
 										<li>
-											<a class="dropdown-item" href="#"
-												>Link 1</a
+											<a
+												class="dropdown-item"
+												href="#"
+												on:click={() =>
+													loadRenameRequestModal(
+														request,
+													)}>Rename</a
 											>
 										</li>
 									</ul>
@@ -194,8 +225,6 @@
 		{/each}
 	</div>
 </div>
-
-
 
 <!-- Create Collection Modal -->
 <Modal open={showCreateCollectionModal} onClosed={(data) => onPopupClose(data)}>
@@ -257,6 +286,29 @@
 		on:click={() => createRequest()}>Create</button
 	>
 </Modal>
+<!-- Create Request Modal end here -->
+
+<!-- Rename  Request Modal -->
+
+<Modal open={showRenameRequestModal} onClosed={(data) => onPopupClose(data)}>
+	<h5 slot="header">New Request</h5>
+	<form on:submit={() => renameRequest()}>
+		<input
+			type="text"
+			class="form-control"
+			placeholder="Request Name"
+			bind:value={rname}
+		/>
+	</form>
+	<button
+		slot="action"
+		class="btn btn-dark btn-sm"
+		type="submit"
+		on:click={() => renameRequest()}>Rename</button
+	>
+</Modal>
+
+<!-- Rename Request Modal end here -->
 
 <style>
 	.list-group-item {
@@ -275,6 +327,8 @@
 		height: 100%;
 		background-color: #f8f9fa;
 		padding-top: 20px;
-		position: fixed;
+		/* position: fixed; */
+		height: 100vh;
+		overflow-y: auto;
 	}
 </style>

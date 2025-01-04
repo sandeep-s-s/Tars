@@ -187,3 +187,15 @@ pub fn rename_collection(uuid: String, name: String) -> Collection {
         .get_result(connection)
         .expect("Error in updating collection")
 }
+
+#[tauri::command]
+pub fn rename_request(uuid: String, rname: String) -> Requests {
+    let request_uuid = uuid.clone();
+    let connection = &mut db::establish_connection();
+    diesel::update(schema::requests::table)
+        .filter(schema::requests::dsl::uuid.eq(request_uuid))
+        .set(schema::requests::dsl::name.eq(rname))
+        .returning(Requests::as_returning())
+        .get_result(connection)
+        .expect("Error in renaming request")
+}

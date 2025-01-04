@@ -8,13 +8,13 @@
   let response = {};
 </script>
 
-<Header />
+<!-- <Header /> -->
 <div class="container-fluid">
   <div class="row">
     <div class="col-2">
       <LeftFold bind:requestUUid bind:response />
     </div>
-    <div class="col-10">
+    <div class="col-10" >
       <RightFold {requestUUid} bind:response />
     </div>
   </div>
