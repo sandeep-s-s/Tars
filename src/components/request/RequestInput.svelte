@@ -4,6 +4,12 @@
   export let requestUUid = "";
   export let response = {};
 
+	import { showToast } from "../../storage/toastStore";
+
+	function triggerToast(message) {
+		showToast(message);
+	}
+
   let loading = false;
 
   let methods = [
@@ -18,6 +24,7 @@
   async function saveRequest(uuid) {
     request = JSON.stringify(request);
     let response = await invoke("save_request", { uuid, request });
+    triggerToast("Request saved")
   }
   async function sendRequest(request) {
     loading = true;
