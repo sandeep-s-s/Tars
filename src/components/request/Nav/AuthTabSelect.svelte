@@ -1,7 +1,6 @@
 <script>
     export let authList = [{}];
     export let authType = "";
-    console.log("authTuye"+authType)
 </script>
 <div class="mt-2">
     <label for="authType" class="form-label">Auth Type</label>

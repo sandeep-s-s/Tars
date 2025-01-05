@@ -4,11 +4,11 @@
   export let requestUUid = "";
   export let response = {};
 
-	import { showToast } from "../../storage/toastStore";
+  import { showToast } from "../../storage/toastStore";
 
-	function triggerToast(message) {
-		showToast(message);
-	}
+  function triggerToast(message) {
+    showToast(message);
+  }
 
   let loading = false;
 
@@ -22,16 +22,18 @@
   export let endpoint = request["endpoint"];
 
   async function saveRequest(uuid) {
+    let requestJson = request;
     request = JSON.stringify(request);
-    let response = await invoke("save_request", { uuid, request });
-    triggerToast("Request saved")
+    await invoke("save_request", { uuid, request });
+    request = requestJson;
+    triggerToast("Request saved");
   }
   async function sendRequest(request) {
     loading = true;
-    // console.log(request)
+    let requestJson = request;
     request = JSON.stringify(request);
     response = await invoke("send_request", { request });
-    // console.log(response)
+    request = requestJson;
     loading = false;
   }
 </script>

@@ -4,6 +4,7 @@ use crate::{db, models, schema, utils::helper};
 use diesel::prelude::*;
 
 use serde_json::Value;
+use tauri::http::request;
 use uuid::Uuid;
 
 use crate::models::*;
@@ -128,15 +129,25 @@ pub async fn get_request(uuid: String) -> String {
 }
 
 #[tauri::command]
-pub fn save_request(uuid: String, request: String) -> Requests {
+pub fn save_request(uuid: String, request: String) -> Result<Requests, String> {
+
     let connection = &mut db::establish_connection();
 
-    diesel::update(schema::requests::table)
-        .filter(schema::requests::dsl::uuid.eq(uuid))
-        .set(schema::requests::dsl::request_data.eq(request))
-        .returning(Requests::as_returning())
-        .get_result(connection)
-        .expect("Error in updating request")
+    let request_object: RequestObject =
+        serde_json::from_str(&request)
+        .map_err(|e| format!("Failed to parse JSON: {}", e))?;
+
+
+    if !request_object.name.is_empty() {
+        diesel::update(schema::requests::table)
+            .filter(schema::requests::dsl::uuid.eq(uuid))
+            .set(schema::requests::dsl::request_data.eq(request))
+            .returning(Requests::as_returning())
+            .get_result(connection)
+            .map_err(|e| format!("Error in updating request: {}", e))
+    } else {
+        Err("Request name is empty".to_string())
+    }
 }
 #[tauri::command]
 pub async fn send_request(request: String) -> Result<JsonResponse, String> {
