@@ -136,7 +136,6 @@
 		</ul>
 	</div>
 	<div class="list-group mt-2">
-		<!-- {#each data.slice(0, 4) as folder, index} -->
 		{#each collections as collection, index}
 			<!-- Limit to 4 folders -->
 			<div class="list-group-item">
@@ -184,50 +183,57 @@
 					</div>
 				</div>
 				{#if collection.is_open}
-					{#each collection.requests as request}
-						<div class="list-group-item mx-1">
-							<div
-								class="d-flex justify-content-between align-items-center active"
-							>
-								<!-- svelte-ignore a11y-click-events-have-key-events -->
-								<!-- svelte-ignore a11y-no-static-element-interactions -->
-								<!-- svelte-ignore a11y-missing-attribute -->
-								<a
-									class=""
-									on:click={() => loadRequest(request.uuid)}
+					{#if collection.requests}
+						{#each collection.requests as request}
+							<div class="list-group-item mx-1">
+								<div
+									class="d-flex justify-content-between align-items-center active"
 								>
-									<i class="bi bi-file-earmark-text-fill"></i>
-									<span
-										class="
-									{activeRequestUuid === request.uuid ? 'text-primary' : ''}"
-										>{truncateString(request.name, 7)}</span
+									<!-- svelte-ignore a11y-click-events-have-key-events -->
+									<!-- svelte-ignore a11y-no-static-element-interactions -->
+									<!-- svelte-ignore a11y-missing-attribute -->
+									<a
+										class=""
+										on:click={() =>
+											loadRequest(request.uuid)}
 									>
-								</a>
-								<div class="dropdown">
-									<button
-										type="button"
-										class="btn"
-										data-bs-toggle="dropdown"
-									>
-										<i class="bi bi-three-dots-vertical"
+										<i class="bi bi-file-earmark-text-fill"
 										></i>
-									</button>
-									<ul class="dropdown-menu">
-										<li>
-											<a
-												class="dropdown-item"
-												href="#"
-												on:click={() =>
-													loadRenameRequestModal(
-														request,
-													)}>Rename</a
-											>
-										</li>
-									</ul>
+										<span
+											class="
+									{activeRequestUuid === request.uuid ? 'text-primary' : ''}"
+											>{truncateString(
+												request.name,
+												7,
+											)}</span
+										>
+									</a>
+									<div class="dropdown">
+										<button
+											type="button"
+											class="btn"
+											data-bs-toggle="dropdown"
+										>
+											<i class="bi bi-three-dots-vertical"
+											></i>
+										</button>
+										<ul class="dropdown-menu">
+											<li>
+												<a
+													class="dropdown-item"
+													href="#"
+													on:click={() =>
+														loadRenameRequestModal(
+															request,
+														)}>Rename</a
+												>
+											</li>
+										</ul>
+									</div>
 								</div>
 							</div>
-						</div>
-					{/each}
+						{/each}
+					{/if}
 				{/if}
 			</div>
 		{/each}
