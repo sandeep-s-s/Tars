@@ -1,10 +1,7 @@
-use schema::collections::table;
-use tauri::menu::{AboutMetadata, Menu, MenuItem, Submenu, SubmenuBuilder};
+use tauri::menu::{AboutMetadata, SubmenuBuilder};
 use tauri::menu::{MenuBuilder, MenuItemBuilder};
-use tauri::tray::TrayIconBuilder;
-use tauri::{Emitter, Manager};
+use tauri::Manager;
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 mod cmd;
 mod db;
 mod models;
@@ -18,15 +15,11 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
-            // let handle = app.handle();
-
-            // my custom settings menu item
             let settings = MenuItemBuilder::new("Settings...")
                 .id("settings")
                 .accelerator("CmdOrCtrl+,")
                 .build(app)?;
 
-            // my custom app submenu
             let app_submenu = SubmenuBuilder::new(app, "App")
                 .about(Some(AboutMetadata {
                     ..Default::default()
@@ -45,21 +38,12 @@ pub fn run() {
             let hide = MenuItemBuilder::new("Hide").id("hide").build(app).unwrap();
             let show = MenuItemBuilder::new("Show").id("show").build(app).unwrap();
 
-            // ... any other submenus
-
             let menu = MenuBuilder::new(app)
-                .items(&[
-                    &app_submenu,
-                    &quit,
-                    &hide,
-                    &show, // ... include references to any other submenus
-                ])
+                .items(&[&app_submenu, &quit, &hide, &show])
                 .build()?;
 
-            // set the menu
             app.set_menu(menu)?;
 
-            // listen for menu item click events
             app.on_menu_event(move |app, event| match event.id().as_ref() {
                 // if event.id() == settings.id() {
                 //     // emit a window event to the frontend

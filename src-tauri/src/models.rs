@@ -8,10 +8,9 @@ use std::collections::HashMap;
 pub struct NewCollection {
     pub name: String,
     pub uuid: String,
-    pub is_open: bool
+    pub is_open: bool,
 }
 
-// #[derive(Queryable, Selectable, Serialize, Deserialize)]
 #[derive(Queryable, Identifiable, Selectable, Debug, PartialEq, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::collections)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
@@ -41,12 +40,9 @@ pub struct NewRequest {
     pub collection_id: i32,
 }
 
-// #[derive(Queryable, Selectable, Serialize, Deserialize,Associations)]
-#[diesel(table_name = crate::schema::requests)]
-// #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+// #[diesel(table_name = crate::schema::requests)]
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq, Serialize)]
-#[diesel(belongs_to(Collection))]
-// #[diesel(table_name = requests)]
+#[diesel(table_name = crate::schema::requests ,belongs_to(Collection))]
 pub struct Requests {
     #[diesel(sql_type = Integer)]
     pub id: i32,
