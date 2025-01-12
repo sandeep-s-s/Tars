@@ -3,7 +3,10 @@ use diesel::prelude::*;
 
 use uuid::Uuid;
 
-use crate::models::*;
+use crate::models::{
+    Collection, CollectionWithRequests, JsonResponse, NewCollection, NewRequest, RequestObject,
+    Requests,
+};
 use crate::utils::helper;
 
 #[tauri::command]
@@ -54,53 +57,39 @@ pub async fn get_collections() -> Vec<CollectionWithRequests> {
 }
 
 #[tauri::command]
-pub fn create_request(rname: String, uuid: String) -> Requests {
+pub fn create_request(rname: String, uuid: String) -> Result<Requests, String> {
+    let request_name = rname.clone();
     use crate::schema::*;
     let connection = &mut db::establish_connection();
     let request_uuid = Uuid::new_v4().hyphenated().to_string();
 
     let collection: models::Collection = schema::collections::table
-        .filter(schema::collections::uuid.eq(uuid)) // Add filter for uuid
+        .filter(schema::collections::uuid.eq(uuid))
         .select(Collection::as_select())
-        .first(connection) // Load the first matching record
-        .expect("Error loading collection"); //
+        .first(connection)
+        .expect("Error loading collection");
 
-    let request_json = r#"{
-                    "v": "1",
-                    "endpoint": "https://httpbin.org/post",
-                    "name": "Get-req",
-                    "params": [],
-                    "headers": [],
-                    "method": "GET",
-                    "auth": {
-                        "authType": "basic",
-                        "authActive": false,
-                        "username": "",
-                        "password": "",
-                        "token": ""
-                    },
-                    "preRequestScript": "",
-                    "testScript": "",
-                    "body": {
-                        "mode": "None",
-                        "formData": [],
-                        "xWwwFormUrlencoded": [],
-                        "rawType": "Json",
-                        "raw": "",
-                        "fromData": []
-                    }
-                    }"#;
+    let request_object = RequestObject::new(
+        rname,
+        "GET".to_string(),
+        "https://httpbin.org/get".to_string(),
+    );
+
+    let request_json = serde_json::to_string(&request_object)
+        .map_err(|e| format!("Failed to parse JSON: {}", e))?;
+
     let new_request: NewRequest = NewRequest {
-        name: rname,
-        request_data: request_json.to_string(),
+        name: request_name,
+        request_data: request_json,
         uuid: String::from(&request_uuid),
         collection_id: collection.id,
     };
+
     diesel::insert_into(requests::table)
         .values(&new_request)
         .returning(Requests::as_returning())
         .get_result(connection)
-        .expect("Error saving new post")
+        .map_err(|e| format!("Error in creating new request: {}", e))
 }
 
 #[tauri::command]

@@ -92,6 +92,23 @@ pub struct RequestObject {
     pub body: Body,
 }
 
+impl RequestObject {
+    pub fn new(name: String, method: String, endpoint: String) -> RequestObject {
+        RequestObject {
+            v: String::from("1.0"),
+            endpoint,
+            name,
+            params: Vec::new(),
+            headers: Vec::new(),
+            method,
+            auth: Auth::default(),
+            pre_request_script: String::new(),
+            test_script: String::new(),
+            body: Body::default(),
+        }
+    }
+}
+
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Param {
