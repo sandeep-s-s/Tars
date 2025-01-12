@@ -1,24 +1,10 @@
-use std::collections::HashMap;
-
-use crate::{db, models, schema, utils::helper};
+use crate::{db, models, schema};
 use diesel::prelude::*;
 
-use serde_json::Value;
-use tauri::http::request;
 use uuid::Uuid;
 
 use crate::models::*;
-
-use base64::{engine::general_purpose, Engine};
-use reqwest::{
-    Method,
-    {
-        multipart::{self, Form, Part},
-        Client, Response,
-    },
-};
-
-use std::path::PathBuf;
+use crate::utils::helper;
 
 #[tauri::command]
 pub fn create_collection(name: String) -> Collection {
@@ -130,13 +116,10 @@ pub async fn get_request(uuid: String) -> String {
 
 #[tauri::command]
 pub fn save_request(uuid: String, request: String) -> Result<Requests, String> {
-
     let connection = &mut db::establish_connection();
 
     let request_object: RequestObject =
-        serde_json::from_str(&request)
-        .map_err(|e| format!("Failed to parse JSON: {}", e))?;
-
+        serde_json::from_str(&request).map_err(|e| format!("Failed to parse JSON: {}", e))?;
 
     if !request_object.name.is_empty() {
         diesel::update(schema::requests::table)

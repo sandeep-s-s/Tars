@@ -15,7 +15,6 @@ pub async fn send_get_request(request: RequestObject) -> Result<JsonResponse, St
     let url = request.endpoint;
     let mut request_builder = client.get(&url);
 
-    // Build query parameters
     let query_params: HashMap<_, _> = request
         .params
         .iter()
@@ -132,7 +131,6 @@ pub async fn send_post_request(request: RequestObject) -> Result<JsonResponse, S
         request_builder = request_builder.body(body);
     }
 
-    // Build query parameters
     let query_params: HashMap<_, _> = request
         .params
         .iter()
@@ -235,7 +233,6 @@ pub async fn send_put_request(request: RequestObject) -> Result<JsonResponse, St
         request_builder = request_builder.body(body);
     }
 
-    // Build query parameters
     let query_params: HashMap<_, _> = request
         .params
         .iter()
