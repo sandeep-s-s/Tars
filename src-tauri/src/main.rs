@@ -5,7 +5,6 @@ extern crate diesel;
 extern crate diesel_migrations;
 
 mod db;
-mod models;
 mod schema;
 
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
