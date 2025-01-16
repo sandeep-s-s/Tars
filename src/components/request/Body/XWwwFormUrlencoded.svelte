@@ -19,7 +19,7 @@
             key: "",
             value: "",
             type: "text",
-            checked: false,
+            checked: true,
         };
 
         const updatedFormData = [...xWwwFormUrlencoded, newObject];

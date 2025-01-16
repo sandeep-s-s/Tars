@@ -37,7 +37,7 @@
             key: "",
             value: "",
             type: "file",
-            checked: false,
+            checked: true,
             src: "",
         };
 

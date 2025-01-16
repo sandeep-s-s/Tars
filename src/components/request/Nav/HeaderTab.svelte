@@ -9,7 +9,7 @@
 		});
 	}
 	const addField = () => {
-		request["headers"] = [...request["headers"], { url: "", name: "" }];
+		request["headers"] = [...request["headers"], { key: "", name: "",checked:true }];
 	};
 
 	const removeField = () => {
@@ -24,8 +24,7 @@
 	};
 	const deleteElement = (index) => {
 		if (index > -1) {
-			// only splice array when item is found
-			request["headers"].splice(index, 1); // 2nd parameter means remove one item only
+			request["headers"].splice(index, 1); 
 		}
 		request["headers"] = request["headers"];
 	};
