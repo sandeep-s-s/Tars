@@ -23,7 +23,7 @@
             key: "",
             value: "",
             type: "text",
-            checked: false,
+            checked: true,
             src: "",
         };
 

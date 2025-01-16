@@ -9,8 +9,7 @@
 		});
 	}
 	const addField = () => {
-		request["params"] = [...request["params"], { key: "", value: "" }];
-		//parameterList.update((val) => val = values)
+		request["params"] = [...request["params"], { key: "", value: "",checked:true }];
 	};
 
 	const removeField = () => {
@@ -18,7 +17,6 @@
 			0,
 			request["params"].length - 1,
 		);
-		//parameterList.update((val) => val = values)
 	};
 
 	const addChecked = (i) => {
@@ -26,11 +24,9 @@
 	};
 	const deleteElement = (index) => {
 		if (index > -1) {
-			// only splice array when item is found
-			request["params"].splice(index, 1); // 2nd parameter means remove one item only
+			request["params"].splice(index, 1); 
 		}
 		request["params"] = request["params"];
-		//parameterList.update((val) => val = values)
 	};
 </script>
 
