@@ -16,6 +16,7 @@
     { id: 1, text: "GET", default: true },
     { id: 2, text: "POST", default: false },
     { id: 3, text: "PUT", default: false },
+    { id: 4, text: "DELETE", default: false },
   ];
 
   export let method = request["method"];

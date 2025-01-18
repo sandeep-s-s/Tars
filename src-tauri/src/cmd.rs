@@ -135,6 +135,9 @@ pub async fn send_request(request: String) -> Result<JsonResponse, String> {
     if request.method.to_lowercase().as_str() == "put" {
         return helper::send_put_request(request).await;
     }
+    if request.method.to_lowercase().as_str() == "delete" {
+        return helper::send_delete_request(request).await;
+    }
     return Err(String::from("Unsupported HTTP method"));
 }
 
