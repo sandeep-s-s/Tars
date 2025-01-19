@@ -4,6 +4,7 @@
 	import JsonEditor from "../Body/JsonEditor.svelte";
 	import TextEditor from "../Body/TextEditor.svelte";
 	import XmlEditor from "../Body/XmlEditor.svelte";
+	import HtmlEditor from "../Body/HtmlEditor.svelte";
 
 	export let request = {};
 
@@ -82,6 +83,11 @@
 	{#if request["body"].mode === "raw" && request["body"].rawType === "Text"}
 		<div class="json-editor">
 			<TextEditor {request} />
+		</div>
+	{/if}
+	{#if request["body"].mode === "raw" && request["body"].rawType === "HTML"}
+		<div class="json-editor">
+			<HtmlEditor {request} />
 		</div>
 	{/if}
 </div>

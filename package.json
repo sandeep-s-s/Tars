@@ -15,7 +15,10 @@
   "dependencies": {
     "@tauri-apps/api": "^2.1.1",
     "@tauri-apps/plugin-dialog": "^2.0.1",
-    "@tauri-apps/plugin-shell": ">=2.0.0"
+    "@tauri-apps/plugin-shell": ">=2.0.0",
+    "html-prettify": "^1.0.7",
+    "svelte-codemirror-editor": "^1.4.1",
+    "xml-formatter": "^3.6.3"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.1",
