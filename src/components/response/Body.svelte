@@ -1,45 +1,27 @@
 <script>
-    import { message } from "@tauri-apps/plugin-dialog";
+    import CodeMirrorEditor from "svelte-codemirror-editor";
     export let response = {};
     import httpStatusCodes from "../../data/httpStatusCodes.json";
+    import { readonly } from "svelte/store";
 
-    let lineCount = 0;
-
-    $: lineCount = response.message ? response.message.split("\n").length : 0;
+    $: jsonData = response.message;
 </script>
 
 <div class="container mt-2">
-    <div class="editor-container">
-        <div class="line-numbers">
-            {#each Array(lineCount) as _, i}
-                {i + 1}<br />
-            {/each}
-        </div>
-        <div class="text-editor" contenteditable="false">
-            {#if response.message}
-                {response.message}
-            {/if}
-        </div>
-    </div>
+    {#if jsonData}
+        
+    <p><strong>Status : {response["status_code"]} {httpStatusCodes[response["status_code"]]}</strong></p>
+    <CodeMirrorEditor
+        bind:value={jsonData}
+        options={{
+            lineNumbers: true,
+            mode: "application/json", // Set mode to JSON
+            theme: "material", // Use the theme you imported
+            autoCloseBrackets: true, // Enable auto-closing brackets
+            tabSize: 2, // Set tab size for indentation
+            indentWithTabs: false, // Use spaces instead of tabs
+        }}
+        readonly
+    />
+    {/if}
 </div>
-
-<style>
-    .editor-container {
-        display: flex;
-        overflow: hidden;
-    }
-    .line-numbers {
-        color: #343434;
-        padding: 10px;
-        text-align: right;
-        user-select: none;
-        border-right: 1px solid #ccc;
-    }
-    .text-editor {
-        flex: 1;
-        padding: 10px;
-        background: #fff;
-        overflow: auto;
-        white-space: pre;
-    }
-</style>
