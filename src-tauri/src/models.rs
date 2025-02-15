@@ -167,3 +167,39 @@ pub struct XWwwFormUrlencoded {
     #[serde(rename = "type")]
     pub type_field: String,
 }
+
+#[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq, Serialize)]
+#[diesel(table_name = crate::schema::tabs, belongs_to(Requests))]
+pub struct Tabs {
+    #[diesel(sql_type = Integer)]
+    pub id: i32,
+    #[diesel(sql_type = Integer)]
+    pub order_id: i32,
+    #[diesel(sql_type = Bool)]
+    pub is_active: bool,
+    #[diesel(sql_type = String)]
+    pub create_date: String,
+    #[diesel(sql_type = String)]
+    pub update_date: String,
+
+    #[diesel(sql_type = Integer)]
+    pub requests_id: i32,
+}
+#[derive(Insertable)]
+#[diesel(table_name = crate::schema::tabs)]
+pub struct NewTab {
+    pub order_id: i32,
+    pub requests_id: i32,
+    pub is_active: bool,
+}
+
+#[derive(Debug, Serialize)]
+pub struct TabResponse {
+    pub id: i32,
+    pub order_id: i32,
+    pub is_active: bool,
+    pub create_date: String,
+    pub update_date: String,
+    pub request_name: String,
+    pub request_uuid: String
+}

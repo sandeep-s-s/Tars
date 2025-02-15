@@ -27,6 +27,22 @@ diesel::table! {
     }
 }
 
-diesel::joinable!(requests -> collections (collection_id));
+diesel::table! {
+    tabs (id) {
+        id -> Integer,
+        order_id -> Integer,
+        is_active -> Bool,
+        create_date -> Timestamp,
+        update_date -> Timestamp,
+        requests_id -> Integer,
+    }
+}
 
-diesel::allow_tables_to_appear_in_same_query!(collections, requests,);
+diesel::joinable!(requests -> collections (collection_id));
+diesel::joinable!(tabs -> requests (requests_id));
+
+diesel::allow_tables_to_appear_in_same_query!(
+    collections,
+    requests,
+    tabs,
+);
