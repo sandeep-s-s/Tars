@@ -7,38 +7,53 @@
 	let request = {};
 	export let response = {};
 
+	let request_response = {};
+
 	/**
-	 * @type {never[]}
+	 * @type {any[]}
 	 */
 	export let tabs = [];
 
+	/**
+	 * @param {string} uuid
+	 */
 	async function loadRequest(uuid) {
-		let response = await invoke("get_request", { uuid });
-		request = JSON.parse(response.request_data);
-		let newTab = {
-			is_active: true,
-			request_name: request.name,
-			request_uuid: response.uuid,
-		};
+		request_response = await invoke("get_request", { uuid });
+		request = JSON.parse(request_response.request_data);
 		const exists = tabs.some(
-			(tab) => tab.request_uuid === newTab.request_uuid,
+			(tab) => tab.request_uuid === request_response.uuid,
 		);
 
 		tabs = tabs.map((tab) => {
-			if (tab.request_uuid === response.uuid) {
+			if (tab.request_uuid === request_response.uuid) {
 				return { ...tab, is_active: true };
 			}
 			return { ...tab, is_active: false };
 		});
 
 		if (!exists) {
+			let newTab = {
+				is_active: true,
+				request_name: request.name,
+				request_uuid: request_response.uuid,
+			};
 			tabs = [...tabs, newTab];
 		}
 	}
 	$: loadRequest(requestUUid);
 </script>
 
-<div class="">
+<div class="mt-3">
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item">
+				<strong>{request_response.collection_name}</strong>
+			</li>
+			<li class="breadcrumb-item active" aria-current="page">
+				{request.name}
+			</li>
+		</ol>
+	</nav>
 	<RequestInput
 		{request}
 		{requestUUid}

@@ -40,7 +40,7 @@
 </script>
 
 <!-- <form on:submit|preventDefault={sendPostRequest}> -->
-<div class="request-top-container mt-5">
+<div class="request-top-container">
   <div class="request-select">
     <select bind:value={method} class="form-control">
       {#each methods as method}

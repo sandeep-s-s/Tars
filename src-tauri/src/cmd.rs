@@ -1,13 +1,12 @@
-use crate::schema::tabs;
+use crate::schema::tabs::{self};
 use crate::{db, models, schema};
 use diesel::prelude::*;
 
-use diesel::result::Error;
 use uuid::Uuid;
 
 use crate::models::{
     Collection, CollectionWithRequests, JsonResponse, NewCollection, NewRequest, NewTab,
-    RequestObject, Requests, TabResponse, Tabs,
+    RequestObject, RequestResponse, Requests, TabResponse, Tabs,
 };
 use crate::utils::helper;
 
@@ -95,7 +94,7 @@ pub fn create_request(rname: String, uuid: String) -> Result<Requests, String> {
 }
 
 #[tauri::command]
-pub async fn get_request(uuid: String) -> Requests {
+pub async fn get_request(uuid: String) -> RequestResponse {
     let mut connection = db::establish_connection();
 
     let request: models::Requests = schema::requests::table
@@ -103,6 +102,18 @@ pub async fn get_request(uuid: String) -> Requests {
         .select(Requests::as_select())
         .first(&mut connection)
         .expect("Error loading request");
+
+    let collection = schema::collections::table
+        .filter(schema::collections::id.eq(request.collection_id))
+        .select(Collection::as_select())
+        .first(&mut connection)
+        .expect("Error while loading collection");
+
+    let request_response = RequestResponse {
+        request_data: request.request_data,
+        uuid: request.uuid,
+        collection_name: collection.name,
+    };
 
     let exists_tab = schema::tabs::table
         .select(Tabs::as_select())
@@ -120,9 +131,17 @@ pub async fn get_request(uuid: String) -> Requests {
         let _ = diesel::insert_into(tabs::table)
             .values(&new_tab_data)
             .execute(&mut connection);
+    } else {
+        let _ = diesel::update(tabs::table)
+            .set(tabs::is_active.eq(false))
+            .execute(&mut connection);
+        let _ = diesel::update(tabs::table)
+            .filter(tabs::requests_id.eq(request.id))
+            .set(tabs::is_active.eq(true))
+            .execute(&mut connection);
     }
 
-    return request;
+    return request_response;
 }
 
 #[tauri::command]

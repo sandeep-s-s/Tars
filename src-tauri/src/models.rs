@@ -40,7 +40,6 @@ pub struct NewRequest {
     pub collection_id: i32,
 }
 
-// #[diesel(table_name = crate::schema::requests)]
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq, Serialize)]
 #[diesel(table_name = crate::schema::requests ,belongs_to(Collection))]
 pub struct Requests {
@@ -60,6 +59,13 @@ pub struct Requests {
     pub update_date: String,
     #[diesel(sql_type = Integer)]
     pub collection_id: i32,
+}
+
+#[derive(Debug, Serialize)]
+pub struct RequestResponse {
+    pub uuid: String,
+    pub request_data: String,
+    pub collection_name: String
 }
 
 #[derive(Serialize)]

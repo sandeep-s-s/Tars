@@ -4,7 +4,10 @@
     import Response from "./Response.svelte";
     import { invoke } from "@tauri-apps/api/core";
 
-    export let requestUUid = "";
+    /**
+     * @type {string | any[]}
+     */
+    export let requestUUid;
 
     export let response = {};
 
@@ -17,8 +20,10 @@
         tabs = await invoke("get_tabs");
     }
     onMount(async () => {
-        getTabs();
+        await getTabs();
+        requestUUid = tabs.find((tab) => tab.is_active)?.request_uuid || null;
     });
+
     /**
      * @param {string} uuid
      */
@@ -43,6 +48,7 @@
                         on:click={() => updateRequestUUid(tab.request_uuid)}
                     >
                         {tab.request_name}
+                        {tab.is_active}
                         <i class="bi bi-x-circle-fill"></i>
                     </a>
                 </li>
