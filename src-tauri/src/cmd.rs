@@ -1,11 +1,12 @@
+use crate::schema::tabs::{self};
 use crate::{db, models, schema};
 use diesel::prelude::*;
 
 use uuid::Uuid;
 
 use crate::models::{
-    Collection, CollectionWithRequests, JsonResponse, NewCollection, NewRequest, RequestObject,
-    Requests,
+    Collection, CollectionWithRequests, JsonResponse, NewCollection, NewRequest, NewTab,
+    RequestObject, RequestResponse, Requests, TabResponse, Tabs,
 };
 use crate::utils::helper;
 
@@ -93,14 +94,54 @@ pub fn create_request(rname: String, uuid: String) -> Result<Requests, String> {
 }
 
 #[tauri::command]
-pub async fn get_request(uuid: String) -> String {
+pub async fn get_request(uuid: String) -> RequestResponse {
     let mut connection = db::establish_connection();
+
     let request: models::Requests = schema::requests::table
-        .filter(schema::requests::uuid.eq(uuid)) // Add filter for uuid
+        .filter(schema::requests::uuid.eq(uuid))
         .select(Requests::as_select())
-        .first(&mut connection) // Load the first matching record
-        .expect("Error loading request"); //
-    return request.request_data;
+        .first(&mut connection)
+        .expect("Error loading request");
+
+    let collection = schema::collections::table
+        .filter(schema::collections::id.eq(request.collection_id))
+        .select(Collection::as_select())
+        .first(&mut connection)
+        .expect("Error while loading collection");
+
+    let request_response = RequestResponse {
+        request_data: request.request_data,
+        uuid: request.uuid,
+        collection_name: collection.name,
+    };
+
+    let exists_tab = schema::tabs::table
+        .select(Tabs::as_select())
+        .filter(schema::tabs::requests_id.eq(request.id))
+        .first(&mut connection)
+        .optional()
+        .expect("Error loading tab details");
+
+    if exists_tab.is_none() {
+        let new_tab_data = NewTab {
+            requests_id: request.id,
+            is_active: true,
+            order_id: 0,
+        };
+        let _ = diesel::insert_into(tabs::table)
+            .values(&new_tab_data)
+            .execute(&mut connection);
+    } else {
+        let _ = diesel::update(tabs::table)
+            .set(tabs::is_active.eq(false))
+            .execute(&mut connection);
+        let _ = diesel::update(tabs::table)
+            .filter(tabs::requests_id.eq(request.id))
+            .set(tabs::is_active.eq(true))
+            .execute(&mut connection);
+    }
+
+    return request_response;
 }
 
 #[tauri::command]
@@ -184,4 +225,50 @@ pub fn rename_request(uuid: String, rname: String) -> Requests {
         .returning(Requests::as_returning())
         .get_result(connection)
         .expect("Error in renaming request")
+}
+
+#[tauri::command]
+pub fn get_tabs() -> Vec<TabResponse> {
+    let conn = &mut db::establish_connection();
+
+    let results = schema::tabs::table
+        .inner_join(schema::requests::table.on(schema::tabs::requests_id.eq(schema::requests::id)))
+        .select((
+            schema::tabs::dsl::id,
+            schema::tabs::dsl::order_id,
+            schema::tabs::dsl::is_active,
+            schema::tabs::dsl::create_date,
+            schema::tabs::dsl::update_date,
+            schema::requests::dsl::name,
+            schema::requests::dsl::uuid,
+        ))
+        .load::<(i32, i32, bool, String, String, String, String)>(conn);
+
+    match results {
+        Ok(rows) => rows
+            .into_iter()
+            .map(
+                |(
+                    id,
+                    order_id,
+                    is_active,
+                    create_date,
+                    update_date,
+                    request_name,
+                    request_uuid,
+                )| TabResponse {
+                    id,
+                    order_id,
+                    is_active,
+                    create_date,
+                    update_date,
+                    request_name,
+                    request_uuid,
+                },
+            )
+            .collect(),
+        Err(_) => {
+            vec![]
+        }
+    }
 }
