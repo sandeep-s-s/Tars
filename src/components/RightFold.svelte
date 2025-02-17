@@ -48,7 +48,6 @@
                         on:click={() => updateRequestUUid(tab.request_uuid)}
                     >
                         {tab.request_name}
-                        {tab.is_active}
                         <i class="bi bi-x-circle-fill"></i>
                     </a>
                 </li>
