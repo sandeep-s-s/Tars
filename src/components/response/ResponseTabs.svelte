@@ -48,8 +48,4 @@
         border-width: 2px 0 0 0;
         border-radius: 0;
     }
-
-    .nav-item > .nav-link.active {
-        /* color: #0a58ca; */
-    }
 </style>
