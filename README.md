@@ -1,8 +1,8 @@
-# Arya
+# Tars
 ### Opensource API Tesitng Application 
 
 
-Arya is a fully offline , light weight, opensource,
+Tars is a fully offline , light weight, opensource,
 Tauri-powered REST API testing tool written in Rust and Svelte.
 
 ## Features
@@ -15,7 +15,7 @@ Tauri-powered REST API testing tool written in Rust and Svelte.
 
 ## Technology
 
-Arya uses a number of open source projects to work properly:
+Tars uses a number of open source projects to work properly:
 
 - [Tauri] - For cross-platform binaries
 - [Svelte] - As Frontend Framework
@@ -25,11 +25,11 @@ Arya uses a number of open source projects to work properly:
 
 ## Installation
 
-Arya requires [Node.js](https://nodejs.org/) v20+ to run.
+Tars requires [Node.js](https://nodejs.org/) v20+ to run.
 
 ```sh
-git clone https://github.com/sandeep-s-s/Arya.git
-cd Arya
+git clone https://github.com/sandeep-s-s/Tars.git
+cd Tars
 npm run dev 
 ```
 
@@ -41,7 +41,7 @@ cargo run
 
 ## Screenshot
 
-![AryaImage](https://sandeepsreekumar.com/arya.png)
+![TarsImage](https://sandeepsreekumar.com/arya.png)
 
 
 

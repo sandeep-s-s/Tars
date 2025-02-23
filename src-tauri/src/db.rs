@@ -27,13 +27,13 @@ fn db_file_exists() -> bool {
 
 fn get_db_path() -> String {
     let home_dir = dirs::home_dir().unwrap();
-    home_dir.to_str().unwrap().to_string() + "/.arya/arya.db"
+    home_dir.to_str().unwrap().to_string() + "/.tars/tars.db"
 }
 
 pub fn establish_connection() -> SqliteConnection {
     dotenv().ok();
 
-    let _env = env::var("ARYA_ENV");
+    let _env = env::var("TARS_ENV");
 
     match _env {
         Ok(_env) => {
@@ -50,7 +50,7 @@ pub fn establish_connection() -> SqliteConnection {
             }
 
             let home_dir = dirs::home_dir().expect("Could not find home directory");
-            let db_path = home_dir.join(".arya/arya.db"); // Specify your database file name
+            let db_path = home_dir.join(".tars/tars.db"); 
             let database_url = db_path.display().to_string();
 
             SqliteConnection::establish(&database_url)
