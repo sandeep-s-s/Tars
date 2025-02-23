@@ -16,5 +16,5 @@ fn main() {
         .run_pending_migrations(MIGRATIONS)
         .expect("Error migrating");
 
-    arya_lib::run()
+    tars_lib::run()
 }

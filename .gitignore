@@ -38,10 +38,11 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 .vscode/
-arya.db
+tars.db
 src/node_modules
 package-lock.json
 
 
 
 src-tauri/Cargo.lock
+src-tauri/tars.db
