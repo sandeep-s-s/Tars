@@ -63,7 +63,7 @@
                     <i
                         class="bi bi-x-circle-fill"
                         on:click={() => closeTab(tab.request_id)}
-                        >{tab.request_id}
+                        >
                     </i>
                 </li>
             </ul>
