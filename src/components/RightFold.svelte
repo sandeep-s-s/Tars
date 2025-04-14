@@ -18,6 +18,9 @@
 
     async function getTabs() {
         tabs = await invoke("get_tabs");
+        if (tabs.length == 0) {
+            requestUUid = null;
+        }
     }
     onMount(async () => {
         await getTabs();
@@ -29,6 +32,14 @@
      */
     function updateRequestUUid(uuid) {
         requestUUid = uuid;
+    }
+
+    /**
+     * @param {string} id
+     */
+    async function closeTab(id) {
+        await invoke("close_tab", { id });
+        getTabs();
     }
 </script>
 
@@ -48,8 +59,12 @@
                         on:click={() => updateRequestUUid(tab.request_uuid)}
                     >
                         {tab.request_name}
-                        <i class="bi bi-x-circle-fill"></i>
                     </a>
+                    <i
+                        class="bi bi-x-circle-fill"
+                        on:click={() => closeTab(tab.request_id)}
+                        >
+                    </i>
                 </li>
             </ul>
         {/each}
@@ -65,3 +80,15 @@
         </div>
     {/if}
 </div>
+
+<style>
+    .nav-item {
+        display: flex;
+        align-items: center;
+    }
+    .bi {
+        margin-right: 8px;
+        display: flex;
+        align-items: center;
+    }
+</style>
