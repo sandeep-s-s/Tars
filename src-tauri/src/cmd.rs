@@ -113,6 +113,7 @@ pub async fn get_request(uuid: String) -> RequestResponse {
         request_data: request.request_data,
         uuid: request.uuid,
         collection_name: collection.name,
+        id: request.id,
     };
 
     let exists_tab = schema::tabs::table
@@ -241,8 +242,9 @@ pub fn get_tabs() -> Vec<TabResponse> {
             schema::tabs::dsl::update_date,
             schema::requests::dsl::name,
             schema::requests::dsl::uuid,
+            schema::requests::dsl::id,
         ))
-        .load::<(i32, i32, bool, String, String, String, String)>(conn);
+        .load::<(i32, i32, bool, String, String, String, String, i32)>(conn);
 
     match results {
         Ok(rows) => rows
@@ -256,6 +258,7 @@ pub fn get_tabs() -> Vec<TabResponse> {
                     update_date,
                     request_name,
                     request_uuid,
+                    request_id,
                 )| TabResponse {
                     id,
                     order_id,
@@ -264,6 +267,7 @@ pub fn get_tabs() -> Vec<TabResponse> {
                     update_date,
                     request_name,
                     request_uuid,
+                    request_id,
                 },
             )
             .collect(),
@@ -271,4 +275,16 @@ pub fn get_tabs() -> Vec<TabResponse> {
             vec![]
         }
     }
+}
+
+#[tauri::command]
+pub fn close_tab(id: i32) -> String {
+    let conn = &mut db::establish_connection();
+
+    diesel::delete(schema::tabs::table)
+        .filter(tabs::requests_id.eq(id))
+        .execute(conn)
+        .expect("Error deleting tab");
+
+    return "Tab removed from list".to_string();
 }

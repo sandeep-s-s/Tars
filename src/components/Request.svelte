@@ -19,13 +19,14 @@
 	 */
 	async function loadRequest(uuid) {
 		request_response = await invoke("get_request", { uuid });
+		console.log(request_response);
 		request = JSON.parse(request_response.request_data);
 		const exists = tabs.some(
 			(tab) => tab.request_uuid === request_response.uuid,
 		);
 
 		tabs = tabs.map((tab) => {
-			if (tab.request_uuid === request_response.uuid) {
+			if (tab.request_id === request_response.id) {
 				return { ...tab, is_active: true };
 			}
 			return { ...tab, is_active: false };
@@ -36,6 +37,7 @@
 				is_active: true,
 				request_name: request.name,
 				request_uuid: request_response.uuid,
+				request_id: request_response.id,
 			};
 			tabs = [...tabs, newTab];
 		}

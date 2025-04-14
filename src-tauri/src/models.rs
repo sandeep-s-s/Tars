@@ -65,7 +65,8 @@ pub struct Requests {
 pub struct RequestResponse {
     pub uuid: String,
     pub request_data: String,
-    pub collection_name: String
+    pub collection_name: String,
+    pub id: i32,
 }
 
 #[derive(Serialize)]
@@ -207,5 +208,6 @@ pub struct TabResponse {
     pub create_date: String,
     pub update_date: String,
     pub request_name: String,
-    pub request_uuid: String
+    pub request_uuid: String,
+    pub request_id: i32,
 }
