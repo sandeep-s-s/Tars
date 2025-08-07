@@ -25,7 +25,7 @@ Tars uses a number of open source projects to work properly:
 
 ## Installation
 
-Tars requires [Node.js](https://nodejs.org/) v20+ and [Rust] (https://doc.rust-lang.org/book/ch01-01-installation.html) v1.84.0+ to run.
+Tars requires [Node.js](https://nodejs.org/) v20+ and [Rust](https://doc.rust-lang.org/book/ch01-01-installation.html) v1.84.0+ to run.
 
 ```sh
 git clone https://github.com/sandeep-s-s/Tars.git
