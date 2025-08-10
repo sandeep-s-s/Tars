@@ -40,9 +40,7 @@ cd src-tauri
 cargo run
 ```
 
-## Screenshot
 
-![TarsImage](https://sandeepss.com/assets/img/arya.png)
 
 
 
