@@ -20,7 +20,7 @@ Tars uses a number of open source projects to work properly:
 - [Tauri] - For cross-platform binaries
 - [Svelte] - As Frontend Framework
 - [Rust] - For Backend
-- [SQLite] - as Database.
+- [SQLite] - as Database
 - [Diesel] - ORM for SQLite
 
 ## Installation
@@ -30,6 +30,7 @@ Tars requires [Node.js](https://nodejs.org/) v20+ and [Rust](https://doc.rust-la
 ```sh
 git clone https://github.com/sandeep-s-s/Tars.git
 cd Tars
+npm install
 npm run dev 
 ```
 
