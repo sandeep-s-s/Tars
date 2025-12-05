@@ -41,7 +41,7 @@ cargo run
 
 ## Screenshot
 
-![TarsImage](https://sandeepss.com/assets/img/arya.png)
+![TarsImage](https://www.sandeepss.com/assets/img/tars.jpg)
 
 
 
