@@ -2,12 +2,12 @@ use tauri::menu::{AboutMetadata, SubmenuBuilder};
 use tauri::menu::{MenuBuilder, MenuItemBuilder};
 use tauri::Manager;
 
-mod cmd;
-mod db;
-mod models;
-mod schema;
+pub mod cmd;
+pub mod db;
+pub mod models;
+pub mod schema;
 
-mod utils;
+pub mod utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -76,7 +76,8 @@ pub fn run() {
             cmd::rename_collection,
             cmd::rename_request,
             cmd::get_tabs,
-            cmd::close_tab
+            cmd::close_tab,
+            cmd::update_tabs
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

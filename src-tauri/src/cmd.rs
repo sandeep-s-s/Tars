@@ -17,7 +17,7 @@ pub fn create_collection(name: String) -> Collection {
     let uuid = Uuid::new_v4().hyphenated().to_string();
 
     let new_collection = NewCollection {
-        name: name,
+        name,
         uuid: String::from(&uuid),
         is_open: false,
     };
@@ -44,7 +44,7 @@ pub async fn get_collections() -> Vec<CollectionWithRequests> {
         .expect("Error in fetching all requests");
 
     // Group the requests per collection
-    let requests_per_collection = all_requests
+    all_requests
         .grouped_by(&all_collections)
         .into_iter()
         .zip(all_collections)
@@ -52,9 +52,7 @@ pub async fn get_collections() -> Vec<CollectionWithRequests> {
             collection,
             requests,
         })
-        .collect::<Vec<CollectionWithRequests>>();
-
-    requests_per_collection
+        .collect::<Vec<CollectionWithRequests>>()
 }
 
 #[tauri::command]
@@ -114,6 +112,7 @@ pub async fn get_request(uuid: String) -> RequestResponse {
         uuid: request.uuid,
         collection_name: collection.name,
         id: request.id,
+        name: request.name,
     };
 
     let exists_tab = schema::tabs::table
@@ -142,7 +141,7 @@ pub async fn get_request(uuid: String) -> RequestResponse {
             .execute(&mut connection);
     }
 
-    return request_response;
+    request_response
 }
 
 #[tauri::command]
@@ -180,7 +179,7 @@ pub async fn send_request(request: String) -> Result<JsonResponse, String> {
     if request.method.to_lowercase().as_str() == "delete" {
         return helper::send_delete_request(request).await;
     }
-    return Err(String::from("Unsupported HTTP method"));
+    Err(String::from("Unsupported HTTP method"))
 }
 
 #[tauri::command]
@@ -286,5 +285,42 @@ pub fn close_tab(id: i32) -> String {
         .execute(conn)
         .expect("Error deleting tab");
 
-    return "Tab removed from list".to_string();
+    "Tab removed from list".to_string()
+}
+#[tauri::command]
+pub fn update_tabs(uuid: String) -> String{
+
+    let mut connection = db::establish_connection();
+    let request: models::Requests = schema::requests::table
+        .filter(schema::requests::uuid.eq(uuid))
+        .select(Requests::as_select())
+        .first(&mut connection)
+        .expect("Error loading request");
+
+    let exists_tab = schema::tabs::table
+        .select(Tabs::as_select())
+        .filter(schema::tabs::requests_id.eq(request.id))
+        .first(&mut connection)
+        .optional()
+        .expect("Error loading tab details");
+
+    if exists_tab.is_none() {
+        let new_tab_data = NewTab {
+            requests_id: request.id,
+            is_active: true,
+            order_id: 0,
+        };
+        let _ = diesel::insert_into(tabs::table)
+            .values(&new_tab_data)
+            .execute(&mut connection);
+    } else {
+        let _ = diesel::update(tabs::table)
+            .set(tabs::is_active.eq(false))
+            .execute(&mut connection);
+        let _ = diesel::update(tabs::table)
+            .filter(tabs::requests_id.eq(request.id))
+            .set(tabs::is_active.eq(true))
+            .execute(&mut connection);
+    }
+    "ggg".to_string()
 }

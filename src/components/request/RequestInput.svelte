@@ -5,6 +5,8 @@
   export let response = {};
 
   import { showToast } from "../../storage/toastStore";
+  import { addOrUpdateByUuid } from "../../storage/storage";
+	import {STORAGE_KEY} from "../../lib/constants"
 
   function triggerToast(message) {
     showToast(message);
@@ -36,6 +38,10 @@
     response = await invoke("send_request", { request });
     request = requestJson;
     loading = false;
+    const uuid = requestUUid
+		const request_response = await invoke("get_request", { uuid });
+    request_response["request_data"] = JSON.stringify(request)
+    await addOrUpdateByUuid(STORAGE_KEY,request_response);
   }
 </script>
 

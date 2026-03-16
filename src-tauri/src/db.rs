@@ -39,8 +39,8 @@ pub fn establish_connection() -> SqliteConnection {
         Ok(_env) => {
             let database_url = &env::var("DATABASE_URL").unwrap();
 
-            SqliteConnection::establish(&database_url)
-                .expect(&format!("Error connecting to {}", &database_url))
+            SqliteConnection::establish(database_url)
+                .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
         }
         Err(_) => {
             warn!("Application env not set");
@@ -50,11 +50,11 @@ pub fn establish_connection() -> SqliteConnection {
             }
 
             let home_dir = dirs::home_dir().expect("Could not find home directory");
-            let db_path = home_dir.join(".tars/tars.db"); 
+            let db_path = home_dir.join(".tars/tars.db");
             let database_url = db_path.display().to_string();
 
             SqliteConnection::establish(&database_url)
-                .expect(&format!("Error connecting to {}", &database_url))
+                .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
         }
     }
 }

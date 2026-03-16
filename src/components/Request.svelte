@@ -2,12 +2,15 @@
 	import { invoke } from "@tauri-apps/api/core";
 	import RequestInput from "./request/RequestInput.svelte";
 	import RequestNav from "./request/RequestNav.svelte";
+	import { getByKeyAndUuid,addOrUpdateByUuid} from "../storage/storage";
+	import {STORAGE_KEY} from "../lib/constants"
 
 	export let requestUUid = "";
 	let request = {};
 	export let response = {};
 
 	let request_response = {};
+
 
 	/**
 	 * @type {any[]}
@@ -18,9 +21,24 @@
 	 * @param {string} uuid
 	 */
 	async function loadRequest(uuid) {
-		request_response = await invoke("get_request", { uuid });
-		console.log(request_response);
-		request = JSON.parse(request_response.request_data);
+		const existingData = getByKeyAndUuid(STORAGE_KEY,uuid)
+		if(Object.keys(existingData).length === 0){
+			request_response = await invoke("get_request", { uuid });
+			await updateTabs(request_response)
+			await addOrUpdateByUuid(STORAGE_KEY,request_response)
+		}else{
+			request_response = existingData
+			if(request_response != null)
+				request = JSON.parse(request_response.request_data);
+		}
+		updateTabs(request_response)
+	}
+	$: loadRequest(requestUUid);
+
+	/**
+     * @param {{ uuid?: any; id?: any; name?: any; }} request_response
+     */
+	function updateTabs(request_response){
 		const exists = tabs.some(
 			(tab) => tab.request_uuid === request_response.uuid,
 		);
@@ -35,14 +53,15 @@
 		if (!exists) {
 			let newTab = {
 				is_active: true,
-				request_name: request.name,
+				request_name: request_response.name,
 				request_uuid: request_response.uuid,
 				request_id: request_response.id,
 			};
 			tabs = [...tabs, newTab];
 		}
 	}
-	$: loadRequest(requestUUid);
+
+
 </script>
 
 <div class="mt-3">

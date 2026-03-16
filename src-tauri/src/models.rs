@@ -67,6 +67,7 @@ pub struct RequestResponse {
     pub request_data: String,
     pub collection_name: String,
     pub id: i32,
+    pub name: String,
 }
 
 #[derive(Serialize)]

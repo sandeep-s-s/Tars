@@ -392,7 +392,7 @@ pub fn get_form_data(form_data_request: Vec<FormDaum>) -> multipart::Form {
 
     for item in form_data_request {
         let file_path = item.src.clone();
-        let file_name = file_path.split('/').last().unwrap_or("file").to_string();
+        let file_name = file_path.split('/').next_back().unwrap_or("file").to_string();
         if item.checked.unwrap_or(false) {
             if item.type_field == "text" {
                 form = form.text(item.key, item.value);

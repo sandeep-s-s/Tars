@@ -19,7 +19,7 @@
     async function getTabs() {
         tabs = await invoke("get_tabs");
         if (tabs.length == 0) {
-            requestUUid = null;
+           requestUUid = null;
         }
     }
     onMount(async () => {
