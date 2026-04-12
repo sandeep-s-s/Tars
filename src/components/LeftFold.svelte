@@ -1,10 +1,12 @@
 <script>
 	import { invoke } from "@tauri-apps/api/core";
-	import { onMount } from "svelte";
+	import { onMount, createEventDispatcher } from "svelte";
 	import Modal from "../Util/Modal.svelte";
 	import { truncateString } from "../Util/util.js";
 
 	import { showToast } from "../storage/toastStore";
+	
+	const dispatch = createEventDispatcher();
 
 	function triggerToast(message) {
 		showToast(message);
@@ -117,6 +119,36 @@
 		showRenameRequestModal = false;
 		triggerToast("Request name modified");
 	}
+
+	async function handleDeleteClick(requestUuid) {
+		const confirmed = await window.confirm("Are you sure you want to delete this request?");
+		
+		if (!confirmed) return;
+		
+		await invoke("delete_request", { uuid: requestUuid });
+		if (activeRequestUuid === requestUuid) {
+			activeRequestUuid = null;
+			requestUUid = "";
+		}
+		getAllCollections();
+		dispatch('refreshTabs');
+		triggerToast("Request deleted");
+	}
+
+	async function handleDeleteCollection(collectionUuid) {
+		const confirmed = await window.confirm("Are you sure you want to delete this collection and all its requests?");
+		
+		if (!confirmed) return;
+		
+		await invoke("delete_collection", { uuid: collectionUuid });
+		activeRequestUuid = null;
+		requestUUid = "";
+		getAllCollections();
+		dispatch('refreshTabs');
+		triggerToast("Collection deleted");
+		getAllCollections();
+		triggerToast("Collection deleted");
+	}
 </script>
 
 <div class="sidebar" style="border-right: 1px solid #ccc;">
@@ -179,6 +211,16 @@
 									>New Request</a
 								>
 							</li>
+							<li><hr class="dropdown-divider" /></li>
+							<li>
+								<button
+									type="button"
+									class="dropdown-item text-danger"
+									on:click={() =>
+										handleDeleteCollection(collection.uuid)}
+									>Delete Collection</button
+								>
+							</li>
 						</ul>
 					</div>
 				</div>
@@ -226,6 +268,17 @@
 														loadRenameRequestModal(
 															request,
 														)}>Rename</a
+												>
+											</li>
+											<li><hr class="dropdown-divider" /></li>
+											<li>
+												<button
+													type="button"
+													class="dropdown-item text-danger"
+													on:click|preventDefault={() =>
+														handleDeleteClick(
+															request.uuid,
+														)}>Delete</button
 												>
 											</li>
 										</ul>
@@ -346,5 +399,10 @@
 		/* position: fixed; */
 		height: 100vh;
 		overflow-y: auto;
+	}
+
+	.dropdown-item.text-danger {
+		width: 100%;
+		text-align: left;
 	}
 </style>
