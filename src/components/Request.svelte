@@ -21,45 +21,28 @@
 	 * @param {string} uuid
 	 */
 	async function loadRequest(uuid) {
+		if (!uuid) return;
+		
 		const existingData = getByKeyAndUuid(STORAGE_KEY,uuid)
 		if(Object.keys(existingData).length === 0){
-			request_response = await invoke("get_request", { uuid });
-			await updateTabs(request_response)
-			await addOrUpdateByUuid(STORAGE_KEY,request_response)
+			try {
+				request_response = await invoke("get_request", { uuid });
+				request = JSON.parse(request_response.request_data);
+				await addOrUpdateByUuid(STORAGE_KEY,request_response)
+				window.dispatchEvent(new CustomEvent('tabsRefresh'));
+			} catch (error) {
+				console.error("Error loading request:", error);
+				request_response = {};
+				request = {};
+			}
 		}else{
 			request_response = existingData
 			if(request_response != null)
 				request = JSON.parse(request_response.request_data);
+			window.dispatchEvent(new CustomEvent('tabsRefresh'));
 		}
-		updateTabs(request_response)
 	}
 	$: loadRequest(requestUUid);
-
-	/**
-     * @param {{ uuid?: any; id?: any; name?: any; }} request_response
-     */
-	function updateTabs(request_response){
-		const exists = tabs.some(
-			(tab) => tab.request_uuid === request_response.uuid,
-		);
-
-		tabs = tabs.map((tab) => {
-			if (tab.request_id === request_response.id) {
-				return { ...tab, is_active: true };
-			}
-			return { ...tab, is_active: false };
-		});
-
-		if (!exists) {
-			let newTab = {
-				is_active: true,
-				request_name: request_response.name,
-				request_uuid: request_response.uuid,
-				request_id: request_response.id,
-			};
-			tabs = [...tabs, newTab];
-		}
-	}
 
 
 </script>

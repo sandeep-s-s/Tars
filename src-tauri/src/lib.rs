@@ -68,6 +68,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             cmd::create_collection,
             cmd::get_collections,
+            cmd::delete_collection,
             cmd::create_request,
             cmd::get_request,
             cmd::save_request,
@@ -75,9 +76,11 @@ pub fn run() {
             cmd::toggle_collection,
             cmd::rename_collection,
             cmd::rename_request,
+            cmd::delete_request,
             cmd::get_tabs,
             cmd::close_tab,
-            cmd::update_tabs
+            cmd::update_tabs,
+            cmd::reorder_tabs
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

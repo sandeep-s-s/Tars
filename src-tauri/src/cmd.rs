@@ -29,6 +29,42 @@ pub fn create_collection(name: String) -> Collection {
 }
 
 #[tauri::command]
+pub fn delete_collection(uuid: String) -> String {
+    let conn = &mut db::establish_connection();
+    
+    let collection: models::Collection = schema::collections::table
+        .filter(schema::collections::uuid.eq(&uuid))
+        .select(Collection::as_select())
+        .first(conn)
+        .expect("Error loading collection");
+    
+    let requests: Vec<models::Requests> = schema::requests::table
+        .filter(schema::requests::collection_id.eq(collection.id))
+        .select(Requests::as_select())
+        .load(conn)
+        .expect("Error loading requests");
+    
+    for request in requests {
+        diesel::delete(schema::tabs::table)
+            .filter(tabs::requests_id.eq(request.id))
+            .execute(conn)
+            .expect("Error deleting associated tabs");
+    }
+    
+    diesel::delete(schema::requests::table)
+        .filter(schema::requests::collection_id.eq(collection.id))
+        .execute(conn)
+        .expect("Error deleting requests");
+    
+    diesel::delete(schema::collections::table)
+        .filter(schema::collections::uuid.eq(&uuid))
+        .execute(conn)
+        .expect("Error deleting collection");
+    
+    "Collection deleted".to_string()
+}
+
+#[tauri::command]
 pub async fn get_collections() -> Vec<CollectionWithRequests> {
     let mut connection = db::establish_connection();
 
@@ -92,20 +128,32 @@ pub fn create_request(rname: String, uuid: String) -> Result<Requests, String> {
 }
 
 #[tauri::command]
-pub async fn get_request(uuid: String) -> RequestResponse {
+pub async fn get_request(uuid: String) -> Result<RequestResponse, String> {
     let mut connection = db::establish_connection();
 
-    let request: models::Requests = schema::requests::table
+    let request_result = schema::requests::table
         .filter(schema::requests::uuid.eq(uuid))
         .select(Requests::as_select())
         .first(&mut connection)
-        .expect("Error loading request");
+        .optional();
+    
+    let request = match request_result {
+        Ok(Some(r)) => r,
+        Ok(None) => return Err("Request not found".to_string()),
+        Err(_) => return Err("Request not found".to_string()),
+    };
 
-    let collection = schema::collections::table
+    let collection_result = schema::collections::table
         .filter(schema::collections::id.eq(request.collection_id))
         .select(Collection::as_select())
         .first(&mut connection)
-        .expect("Error while loading collection");
+        .optional();
+    
+    let collection = match collection_result {
+        Ok(Some(c)) => c,
+        Ok(None) => return Err("Collection not found".to_string()),
+        Err(_) => return Err("Collection not found".to_string()),
+    };
 
     let request_response = RequestResponse {
         request_data: request.request_data,
@@ -120,7 +168,7 @@ pub async fn get_request(uuid: String) -> RequestResponse {
         .filter(schema::tabs::requests_id.eq(request.id))
         .first(&mut connection)
         .optional()
-        .expect("Error loading tab details");
+        .unwrap_or(None);
 
     if exists_tab.is_none() {
         let new_tab_data = NewTab {
@@ -141,7 +189,7 @@ pub async fn get_request(uuid: String) -> RequestResponse {
             .execute(&mut connection);
     }
 
-    request_response
+    Ok(request_response)
 }
 
 #[tauri::command]
@@ -286,6 +334,44 @@ pub fn close_tab(id: i32) -> String {
         .expect("Error deleting tab");
 
     "Tab removed from list".to_string()
+}
+
+#[tauri::command]
+pub fn delete_request(uuid: String) -> String {
+    let conn = &mut db::establish_connection();
+    
+    let request: models::Requests = schema::requests::table
+        .filter(schema::requests::uuid.eq(&uuid))
+        .select(Requests::as_select())
+        .first(conn)
+        .expect("Error loading request");
+    
+    diesel::delete(schema::tabs::table)
+        .filter(tabs::requests_id.eq(request.id))
+        .execute(conn)
+        .expect("Error deleting associated tabs");
+    
+    diesel::delete(schema::requests::table)
+        .filter(schema::requests::uuid.eq(&uuid))
+        .execute(conn)
+        .expect("Error deleting request");
+    
+    "Request deleted".to_string()
+}
+
+#[tauri::command]
+pub fn reorder_tabs(tab_orders: Vec<(i32, i32)>) -> String {
+    let conn = &mut db::establish_connection();
+    
+    for (tab_id, new_order) in tab_orders {
+        diesel::update(schema::tabs::table)
+            .filter(schema::tabs::dsl::id.eq(tab_id))
+            .set(schema::tabs::dsl::order_id.eq(new_order))
+            .execute(conn)
+            .expect("Error reordering tab");
+    }
+    
+    "Tabs reordered".to_string()
 }
 #[tauri::command]
 pub fn update_tabs(uuid: String) -> String{

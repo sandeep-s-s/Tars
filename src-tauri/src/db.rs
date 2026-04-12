@@ -39,8 +39,12 @@ pub fn establish_connection() -> SqliteConnection {
         Ok(_env) => {
             let database_url = &env::var("DATABASE_URL").unwrap();
 
-            SqliteConnection::establish(database_url)
-                .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
+            let mut connection = SqliteConnection::establish(database_url)
+                .unwrap_or_else(|_| panic!("Error connecting to {}", database_url));
+
+            let _ = diesel::sql_query("PRAGMA busy_timeout = 5000").execute(&mut connection);
+            let _ = diesel::sql_query("PRAGMA journal_mode = WAL").execute(&mut connection);
+            connection
         }
         Err(_) => {
             warn!("Application env not set");
@@ -50,11 +54,15 @@ pub fn establish_connection() -> SqliteConnection {
             }
 
             let home_dir = dirs::home_dir().expect("Could not find home directory");
-            let db_path = home_dir.join(".tars/tars.db");
-            let database_url = db_path.display().to_string();
+            let home_dir = home_dir.join(".tars/tars.db");
+            let database_url = home_dir.display().to_string();
 
-            SqliteConnection::establish(&database_url)
-                .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
+            let mut connection = SqliteConnection::establish(&database_url)
+                .unwrap_or_else(|_| panic!("Error connecting to {}", database_url));
+
+            let _ = diesel::sql_query("PRAGMA busy_timeout = 5000").execute(&mut connection);
+            let _ = diesel::sql_query("PRAGMA journal_mode = WAL").execute(&mut connection);
+            connection
         }
     }
 }

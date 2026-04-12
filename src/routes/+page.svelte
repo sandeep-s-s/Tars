@@ -7,13 +7,17 @@
 
   let requestUUid = "";
   let response = {};
+  
+  function refreshTabs() {
+    const event = new CustomEvent('tabsRefresh');
+    window.dispatchEvent(event);
+  }
 </script>
 
-<!-- <Header /> -->
 <div class="container-fluid">
   <div class="row">
     <div class="col-2">
-      <LeftFold bind:requestUUid bind:response />
+      <LeftFold bind:requestUUid bind:response on:refreshTabs={refreshTabs} />
     </div>
     <div class="col-10">
       <RightFold {requestUUid} bind:response />
@@ -21,6 +25,3 @@
   </div>
 </div>
 <Toast />
-
-<style>
-</style>
